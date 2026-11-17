@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#1a1a2e">
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Moteur OCR Local 100% navigateur (sans clé API ni serveur) -->
+  <!-- Moteur OCR local exécuté dans le navigateur -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root {
@@ -838,22 +838,24 @@
       background: #0f172a;
     }
     .btn-rotate-img {
-      background: #f1f5f9;
-      color: #334155;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 0.76rem;
-      font-weight: 600;
+      background: #ffffff;
+      color: #6d28d9;
+      border: 1.5px solid #c4b5fd;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
+      box-shadow: 0 1px 4px rgba(109, 40, 217, 0.12);
       transition: all 0.15s;
     }
     .btn-rotate-img:hover {
-      background: #e2e8f0;
-      color: #0f172a;
+      background: #f5f3ff;
+      border-color: #8b5cf6;
+      color: #5b21b6;
     }
     .scan-upload-zone {
       border: 2px dashed #c4b5fd; border-radius: 10px; background: #faf5ff; padding: 20px; text-align: center; cursor: pointer;
@@ -1321,16 +1323,16 @@
       <div class="modal-body">
         <div class="ocr-status-banner">
           <div style="font-weight:700; color:#1e3a8a; font-size:0.83rem; display:flex; align-items:center; gap:6px;">
-            <span>⚡ Reconnaissance 100% Locale (Zéro clé API, 100% confidentiel)</span>
+            <span>Traitement local 100 % — analyse sécurisée</span>
           </div>
           <p style="font-size:0.75rem; color:#475569; margin-top:3px;">
-            L'analyse de la plaque est effectuée directement par votre navigateur. Vos données et photos ne quittent jamais votre appareil.
+            Les données sont traitées directement dans le navigateur, sans transmission externe ni stockage distant.
           </p>
         </div>
 
         <div class="scan-upload-zone" onclick="document.getElementById('cameraInput').click()">
           <div style="font-size: 2.2rem; margin-bottom: 6px;">📸</div>
-          <strong style="color: var(--dark-bg); font-size: 0.95rem;">Prendre la photo de la plaque</strong>
+          <strong style="color: var(--dark-bg); font-size: 0.95rem;">Veuillez prendre une photo de la plaque signalétique de l’appareil afin d’analyser les informations techniques.</strong>
           <p style="color: #64748b; font-size: 0.8rem; margin-top: 4px;">Plaque signalétique moteur, clim, compresseur ou extrait de notice</p>
         </div>
 
