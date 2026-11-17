@@ -2024,7 +2024,7 @@
         }
       }
 
-      if (!pWatts) pWatts = 500; // Valeur indicative par défaut
+      if (!pWatts) remarques.push("Puissance non détectée : vérifiez la plaque et saisissez-la manuellement");
 
       // 9. Identification de la marque connue avec tolérance aux artefacts OCR (logos circulaires, coupures)
       const brandsMap = [
@@ -2070,13 +2070,13 @@
       const isElecSpec = str => /^(?:\d+VAC|\d+VDC|\d+V|\d+HZ|\d+A|\d+AMAX|\d+MAX|\d+W|\d+VA|\d+KVA|\d+KW)$/i.test(str);
 
       // 10. Extraction du Modèle / Référence exacte (tolérance aux séparateurs et typos OCR : Model, Modet, Mode, etc.)
-      const modelMatch = clean.match(/(?:MODE[LT1!]?|MOD[EÈ]LE?|\bMOD\b|M\/N|\bTYPE\b|\bREF(?:[EÉ]RENCE)?\b|ITEM\s*NO|\bCODE\b)\s*[:;.,'\-]?\s*([A-Za-z0-9\-_/]{3,30})/i);
+      const modelMatch = clean.match(/(?:MODE[LT1!]?|MOD[EÈ]LE?|\bMOD\b|M\/N|P\/N|\bTYPE\b|\bREF(?:[EÉ]RENCE)?\b|ITEM\s*NO|\bCODE\b)\s*(?:NO\.?|NUMBER|N°)?\s*[:;.,'\-]?\s*([A-Za-z0-9][A-Za-z0-9\-_/]{2,29})/i);
       if (modelMatch && !isElecSpec(modelMatch[1])) {
         modele = modelMatch[1].trim();
       }
 
       // 11. Extraction du Numéro de Série (S/N, Serial No, etc.)
-      const snMatch = clean.match(/(?:SERIAL\s*NUMBER|SERIAL(?:\s*NO\.?)?|SER\.?\s*NO\.?|N°\s*S[EÉ]RIE|\bS\/?N\b|\bSERIAL\b)\s*[:;.,'\-]?\s*([A-Za-z0-9\-_]{4,30})/i);
+      const snMatch = clean.match(/(?:SERIAL(?:\s*(?:NO\.?|NUMBER))?|SER\.?\s*NO\.?|N[°º]\s*S[EÉ]RIE|\bS\s*[\/.\-]?\s*N\b)\s*[:;.,'\-]?\s*([A-Za-z0-9][A-Za-z0-9\-_]{3,29})/i);
       if (snMatch && !isElecSpec(snMatch[1])) {
         sn = snMatch[1].trim();
         remarques.push(`N° série relevé : ${sn}`);
@@ -2110,10 +2110,10 @@
       } else if (/(?:DVR\b|NVR\b|RECORDER|CAMERA|CCTV|VIDEO\s*RECORDER)/i.test(upper)) {
         typeAppareil = "Enregistreur DVR / NVR";
         ku = 1.0; ks = 1.0; duree = 24; dureeNuit = 12;
-      } else if (/(?:IVPS|INVERTER|ONDULEUR|CONVERTISSEUR|SOLAR|HYBRID|UPS\b|DC\s*INPUT|AC\s*OUTPUT)/i.test(upper)) {
+      } else if (/(?:IVPS|INVERTER|ONDULEUR|CONVERTISSEUR|SOLAR|HYBRID|UPS\b|DC\s*INPUT|AC\s*OUTPUT)/i.test(upper) || /^IVPS/i.test(modele)) {
         typeAppareil = "Onduleur Solaire";
         ku = 0.9; ks = 1.0; duree = 24; dureeNuit = 12;
-      } else if (upper.includes("COMPUTER") || upper.includes("PC") || upper.includes("ORDINATEUR") || upper.includes("DESKTOP") || upper.includes("LAPTOP")) {
+      } else if (/(?:COMPUTER|\bPC\b|ORDINATEUR|DESKTOP|LAPTOP)/i.test(upper)) {
         typeAppareil = "Poste informatique";
         ku = 0.7; ks = 0.85; duree = 8; dureeNuit = 1;
       } else if (upper.includes("TV") || upper.includes("TELEVISION") || upper.includes("DECODEUR")) {
@@ -2154,7 +2154,7 @@
       if (marque) compNotice.push(marque);
       if (modele) compNotice.push(modele);
       if (sn) compNotice.push("SN " + sn);
-      if (!marque && !modele && typeAppareil) compNotice.push(typeAppareil);
+      if (typeAppareil) compNotice.unshift(typeAppareil);
 
       const noticeQuery = compNotice.join(" ") || desigFinale;
 
@@ -2163,7 +2163,7 @@
         noticeQuery: noticeQuery,
         modele: modele,
         sn: sn,
-        puissanceW: pWatts,
+        puissanceW: pWatts || "",
         cosphi: cosphi,
         ku: ku,
         ks: ks,
@@ -2175,7 +2175,8 @@
 
     function validerInsertionScan() {
       const desig = document.getElementById("aiDesig").value || "Appareil scanné";
-      const p = parseFloat(document.getElementById("aiPuissance").value) || 100;
+      const puissanceSaisie = parseFloat(document.getElementById("aiPuissance").value);
+      const p = Number.isFinite(puissanceSaisie) ? puissanceSaisie : 0;
       const cosphi = parseFloat(document.getElementById("aiCosphi").value) || 0.85;
       const ku = parseFloat(document.getElementById("aiKu").value) || 0.8;
       const ks = parseFloat(document.getElementById("aiKs").value) || 0.85;
