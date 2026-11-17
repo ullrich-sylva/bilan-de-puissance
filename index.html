@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Bilan Électrique & Dimensionnement Solaire — Bold Technology & Engineering</title>
+
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a1a2e">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Moteur OCR Local 100% navigateur (sans clé API ni serveur) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <style>
+    :root {
+      --primary: #c0392b;
+      --primary-dark: #962d22;
+      --primary-light: #fef2f2;
+      --dark-bg: #1a1a2e;
+      --dark-surface: #16213e;
+      --gray-bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --accent: #2563eb;
+      --solar-accent: #f59e0b;
+      --solar-dark: #d97706;
+      --solar-bg: #fffdf5;
+      --ai-accent: #7c3aed;
+      --ai-dark: #6d28d9;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--gray-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+      overflow-x: hidden;
+    }
+
+    /* Filigrane discret */
+    .watermark-bg {
+      position: fixed;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      max-width: 90vw;
+      height: 340px;
+      background: url('logo.jpg') center/contain no-repeat;
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER FULL WIDTH ── */
+    header.main-header {
+      background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-surface) 60%, var(--dark-bg) 100%);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid var(--primary);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      width: 100%;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      height: 46px;
+      width: auto;
+      border-radius: 6px;
+      background: #fff;
+      padding: 3px 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+
+    .brand-title h1 {
+      color: #ffffff;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      line-height: 1.2;
+    }
+
+    .brand-title p {
+      color: #94a3b8;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Switchs tactiles */
+    .switch-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      padding: 7px 14px;
+      border-radius: 30px;
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .switch-wrapper:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    .switch-solar {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #4b5563; transition: .25s; border-radius: 20px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+      background-color: white; transition: .25s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--primary); }
+    .switch-solar input:checked + .slider { background-color: var(--solar-accent); }
+    input:checked + .slider:before { transform: translateX(16px); }
+
+    .btn-header {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-header:hover {
+      background: rgba(255,255,255,0.22);
+    }
+    .btn-pdf {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .btn-pdf:hover {
+      background: var(--primary-dark);
+    }
+
+    /* ── CONTENEUR PRINCIPAL PLEINE LARGEUR (FULL WIDTH OCCUPANCY) ── */
+    main.main-content {
+      width: 100%;
+      max-width: 100%;
+      padding: 18px 28px 40px;
+      margin: 0 auto;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── FICHE PROJET PLEINE LARGEUR ── */
+    .project-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+      padding: 16px 22px;
+      margin-bottom: 16px;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .field-group label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .field-group input, .field-group select {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      background: #fafafa;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    .field-group input:focus, .field-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+    }
+
+    /* ── SECTION PARAMÈTRES SOLAIRES (Pleine largeur) ── */
+    .solar-params-card {
+      background: var(--solar-bg);
+      border-radius: 12px;
+      border: 1.5px solid #fde68a;
+      padding: 16px 22px;
+      margin-bottom: 16px;
+      display: none;
+      box-shadow: 0 3px 14px rgba(245, 158, 11, 0.08);
+      animation: fadeIn 0.25s ease-out;
+    }
+    body.show-solar .solar-params-card {
+      display: block;
+    }
+    .solar-params-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--solar-dark);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .solar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── BARRE D'OUTILS RAPIDE ── */
+    .quick-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .library-selector-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 340px;
+    }
+    .select-library {
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-color);
+      background: #fff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-main);
+      cursor: pointer;
+      flex: 1;
+      min-height: 42px;
+    }
+    .btn-add-lib {
+      background: var(--dark-surface);
+      color: #fff;
+      border: none;
+      padding: 0 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .btn-add-lib:hover { background: #0f172a; }
+
+    .toolbar-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-ai-scan {
+      background: linear-gradient(135deg, var(--ai-accent), var(--ai-dark));
+      color: #ffffff;
+      border: none;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      box-shadow: 0 2px 8px rgba(109, 40, 217, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-ai-scan:hover {
+      background: linear-gradient(135deg, var(--ai-dark), #5b21b6);
+      transform: translateY(-1px);
+    }
+    .btn-add-custom {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 42px;
+      box-shadow: 0 2px 8px rgba(192, 57, 43, 0.25);
+      transition: all 0.2s;
+    }
+    .btn-add-custom:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    /* ── TABLEAU PLEINE LARGEUR (SPACIEUX ET RESPONSIVE) ── */
+    .table-card {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      overflow-x: auto;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+
+    thead th {
+      background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+      color: white;
+      padding: 13px 12px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    thead th.col-desig {
+      text-align: left;
+      padding-left: 18px;
+      width: 28%; /* Prend une part confortable de l'écran */
+      min-width: 240px;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.15s;
+    }
+    tbody tr:hover {
+      background-color: #fafbfc;
+    }
+
+    tbody td {
+      padding: 9px 8px;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+    tbody td:first-child {
+      padding-left: 18px;
+      text-align: left;
+    }
+
+    /* Masquer les flèches haut/bas du navigateur qui écrasent le texte dans les cases */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    input.tbl-input {
+      width: 100%;
+      padding: 7px 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      text-align: center;
+      background: #fdfdfd;
+      min-height: 38px;
+      transition: border-color 0.15s;
+    }
+    input.tbl-input.compact {
+      padding: 7px 2px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    input.tbl-input.left-align {
+      text-align: left;
+      padding-left: 10px;
+    }
+    input.tbl-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.12);
+      background: #fff;
+    }
+
+    .val-cell {
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    /* Colonnes avancées & solaires */
+    .col-advanced { display: none; }
+    body.show-advanced .col-advanced { display: table-cell; }
+
+    .col-solar { display: none; }
+    body.show-solar .col-solar { display: table-cell; }
+    th.col-solar-head {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+    }
+
+    .btn-row-del {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-row-del:hover {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    /* Pied de tableau */
+    tfoot tr {
+      background: #f8fafc;
+      border-top: 2px solid #cbd5e1;
+    }
+    tfoot td {
+      padding: 14px 10px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+    tfoot td:first-child {
+      text-align: right;
+      padding-right: 18px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .total-highlight {
+      color: var(--primary);
+      font-size: 1.05rem;
+    }
+    .total-highlight small {
+      display: block;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* ── TABLEAU DE BORD SYNTHÈSE PLEINE LARGEUR ── */
+    .summary-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .summary-heading h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--dark-bg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-mode {
+      background: #e0e7ff;
+      color: #3730a3;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-weight: 700;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+      width: 100%;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 18px 22px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 5px; height: 100%;
+      background: var(--primary);
+    }
+    .kpi-card.accent-blue::before { background: #2563eb; }
+    .kpi-card.accent-amber::before { background: #d97706; }
+    .kpi-card.accent-emerald::before { background: #059669; }
+
+    .kpi-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .kpi-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--dark-bg);
+    }
+    .kpi-value span {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+    .kpi-sub {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── BLOC SPÉCIFIQUE SOLAIRE PLEINE LARGEUR ── */
+    .solar-dashboard-section {
+      display: none;
+      margin-bottom: 24px;
+      animation: fadeIn 0.3s ease-out;
+      width: 100%;
+    }
+    body.show-solar .solar-dashboard-section {
+      display: block;
+    }
+    .solar-dashboard-card {
+      background: #ffffff;
+      border: 1.5px solid #fcd34d;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.08);
+    }
+    .solar-dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #fef3c7;
+    }
+    .solar-dashboard-header h4 {
+      font-size: 1.05rem;
+      color: var(--solar-dark);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .solar-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .solar-kpi-item {
+      background: #fffbeb;
+      border-radius: 10px;
+      padding: 16px 20px;
+      border: 1px solid #fef3c7;
+      border-left: 5px solid var(--solar-accent);
+    }
+    .solar-kpi-item .lbl {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #92400e;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .solar-kpi-item .val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #78350f;
+    }
+    .solar-kpi-item .sub {
+      font-size: 0.75rem;
+      color: #b45309;
+      margin-top: 4px;
+    }
+
+    .solar-recom-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      background: #fafaf9;
+      padding: 18px 22px;
+      border-radius: 10px;
+      border: 1px solid #e7e5e4;
+    }
+    .solar-recom-box strong {
+      display: block;
+      color: #292524;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .solar-recom-box .box-value {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--solar-dark);
+    }
+
+    /* Spécifications Générales Tableau AC */
+    .technical-specs-card {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 22px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      width: 100%;
+    }
+    .specs-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--dark-surface);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .spec-item {
+      background: #f8fafc;
+      padding: 14px 18px;
+      border-radius: 10px;
+      border-left: 4px solid #cbd5e1;
+    }
+    .spec-item.highlight {
+      border-left-color: var(--primary);
+      background: #fff8f8;
+    }
+    .spec-item strong {
+      display: block;
+      color: var(--dark-bg);
+      font-size: 0.78rem;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .spec-item .spec-val {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    /* ── MODALE SCANNER IA ── */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .modal-content {
+      background: #ffffff;
+      border-radius: 14px;
+      max-width: 580px;
+      width: 100%;
+      max-height: 88vh;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      background: linear-gradient(135deg, var(--ai-dark), var(--ai-accent));
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 1.05rem; font-weight: 700; }
+    .btn-close-modal {
+      background: rgba(255,255,255,0.18);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .modal-body { padding: 20px; overflow-y: auto; }
+    .ocr-status-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+    .manual-search-box {
+      margin-top: 14px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .manual-search-box input {
+      flex: 1;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    .btn-search-manual {
+      background: #1e293b;
+      color: #fff;
+      border: none;
+      padding: 0 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-search-manual:hover {
+      background: #0f172a;
+    }
+    .scan-upload-zone {
+      border: 2px dashed #c4b5fd; border-radius: 10px; background: #faf5ff; padding: 24px; text-align: center; cursor: pointer;
+    }
+    .scan-preview-img {
+      max-width: 100%; max-height: 200px; border-radius: 8px; margin: 12px auto; display: none; border: 1px solid #e5e7eb;
+    }
+    .ai-loading-box { display: none; text-align: center; padding: 18px; }
+    .ai-spinner {
+      width: 38px; height: 38px; border: 4px solid #f3e8ff; border-top-color: var(--ai-accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ai-result-box {
+      display: none; margin-top: 16px; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 16px;
+    }
+    .ai-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .ai-field { display: flex; flex-direction: column; gap: 4px; }
+    .ai-field label { font-size: 0.72rem; font-weight: 700; color: #475569; }
+    .ai-field input { padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 0.88rem; font-weight: 600; }
+    .modal-footer {
+      padding: 14px 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    /* ── FOOTER ── */
+    footer.main-footer {
+      background: var(--dark-bg);
+      color: #94a3b8;
+      text-align: center;
+      padding: 16px 20px;
+      font-size: 0.82rem;
+      margin-top: auto;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      width: 100%;
+    }
+    .toast {
+      position: fixed; bottom: calc(24px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
+      background: #1f2937; color: #fff; padding: 10px 22px; border-radius: 30px; font-size: 0.85rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25); display: none; z-index: 2000;
+    }
+
+    /* ── RESPONSIVE MOBILE ── */
+    @media (max-width: 1024px) {
+      .kpi-grid, .solar-kpis { grid-template-columns: repeat(2, 1fr); }
+      .solar-recom-grid, .specs-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      main.main-content { padding: 12px 14px 30px; }
+      header.main-header { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px 16px; }
+      .header-controls { justify-content: space-between; width: 100%; }
+      .quick-toolbar { flex-direction: column; align-items: stretch; }
+      .toolbar-actions-right { display: grid; grid-template-columns: 1fr 1fr; }
+      .kpi-grid, .solar-kpis { grid-template-columns: 1fr; }
+      .project-grid, .solar-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── IMPRESSION ── */
+    @media print {
+      body { background: #fff !important; color: #000 !important; font-size: 9.5pt; }
+      .watermark-bg, .header-controls, .quick-toolbar, .btn-row-del, footer.main-footer, .toast, .modal-overlay { display: none !important; }
+      header.main-header { background: #fff !important; color: #000 !important; border-bottom: 2px solid var(--primary) !important; padding: 10px 0 !important; }
+      .brand-title h1 { color: #000 !important; }
+      main.main-content { margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+      .table-card, .kpi-card, .solar-dashboard-card, .technical-specs-card, .project-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+      input { border: none !important; background: transparent !important; }
+      thead th { background: #c0392b !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="watermark-bg"></div>
+
+  <!-- Header Pleine Largeur -->
+  <header class="main-header">
+    <div class="brand-group">
+      <img src="logo.jpg" alt="Logo Bold Technology" class="brand-logo">
+      <div class="brand-title">
+        <h1>Bold Technology & Engineering</h1>
+        <p>Bilan Électrique & Dimensionnement Photovoltaïque</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Switch Solaire -->
+      <label class="switch-wrapper switch-solar" title="Activer les paramètres et calculs solaires (Panneaux, Batteries, Onduleur)">
+        <span class="switch">
+          <input type="checkbox" id="toggleSolar" onchange="toggleModeSolaire()">
+          <span class="slider"></span>
+        </span>
+        <span>☀️ Solaire</span>
+      </label>
+
+      <!-- Switch Mode Avancé -->
+      <label class="switch-wrapper" title="Afficher/masquer les coefficients Ku, Ks, cos φ et puissances calculées">
+        <span class="switch">
+          <input type="checkbox" id="toggleAdvanced" onchange="toggleModeAvance()">
+          <span class="slider"></span>
+        </span>
+        <span>Avancé</span>
+      </label>
+
+      <button class="btn-header" onclick="reinitialiserBilan()" title="Remettre à zéro">
+        🔄 Vider
+      </button>
+      <button class="btn-header btn-pdf" onclick="window.print()" title="Imprimer ou enregistrer en PDF">
+        📄 PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Contenu Principal Occupant Toute la Largeur -->
+  <main class="main-content">
+
+    <!-- Fiche Projet Pleine Largeur -->
+    <section class="project-card">
+      <div class="project-grid">
+        <div class="field-group">
+          <label>Client / Entreprise</label>
+          <input type="text" id="projClient" placeholder="Ex: Entreprise ABC" oninput="sauvegarderLocal()">
+        </div>
+        <div class="field-group">
+          <label>Projet / Affaire</label>
+          <input type="text" id="projNom" placeholder="Ex: Installation Solaire Villa" oninput="sauvegarderLocal()">
+        </div>
+        <div class="field-group">
+          <label>Lieu / Site (Cameroun)</label>
+          <input type="text" id="projSite" placeholder="Ex: Douala - Bonanjo / Yaoundé - Bastos" oninput="sauvegarderLocal()">
+        </div>
+        <div class="field-group">
+          <label>Date</label>
+          <input type="date" id="projDate" oninput="sauvegarderLocal()">
+        </div>
+        <div class="field-group">
+          <label>Réseau AC</label>
+          <select id="tensionReseau" onchange="calculerTout()">
+            <option value="230" selected>Monophasé 230V</option>
+            <option value="400">Triphasé 400V (3P+N)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Réserve AC</label>
+          <select id="margeExtension" onchange="calculerTout()">
+            <option value="1.10">+10% (Minimale)</option>
+            <option value="1.20" selected>+20% (Recommandé)</option>
+            <option value="1.30">+30% (Extension future)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fiche Paramètres Solaire Pleine Largeur -->
+    <section class="solar-params-card">
+      <div class="solar-params-title">
+        <span>☀️ Paramètres du Système Photovoltaïque & Stockage</span>
+      </div>
+      <div class="solar-grid">
+        <div class="field-group">
+          <label>Ensoleillement (HPS Cameroun)</label>
+          <select id="solarHps" onchange="calculerTout()">
+            <option value="4.0">4.0 h/j — Zone côtière / Saison pluies (Douala, Kribi, Edéa)</option>
+            <option value="4.3">4.3 h/j — Grand Sud & Centre (Yaoundé, Mbalmayo, Ebolowa)</option>
+            <option value="4.5" selected>4.5 h/j — Hauts-Plateaux de l'Ouest (Bafoussam, Bamenda, Dschang)</option>
+            <option value="5.0">5.0 h/j — Plateau de l'Adamaoua (Ngaoundéré, Tibati)</option>
+            <option value="5.5">5.5 h/j — Grand Nord Sahélien (Garoua, Maroua, Kousséri)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Tension Batteries (DC)</label>
+          <select id="solarTensionBatt" onchange="calculerTout()">
+            <option value="12">12 V (&lt; 1 kVA)</option>
+            <option value="24">24 V (1 à 2 kVA)</option>
+            <option value="48" selected>48 V (Standard recommandé 3 à 15 kVA)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Technologie Batteries (Cameroun)</label>
+          <select id="solarTechBatt" onchange="calculerTout()">
+            <option value="0.85;0.95;LiFePO4" selected>Lithium LiFePO4 (DoD 85% - Tropicalisée pro 6000 cycles)</option>
+            <option value="0.50;0.80;Gel">GEL Solaire 12V 200Ah (DoD 50% - Standard éco)</option>
+            <option value="0.60;0.85;OPzV">Tubulaire OPzV étanche (DoD 60% - Industrielle)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Autonomie Souhaitée</label>
+          <select id="solarAutonomie" onchange="calculerTout()">
+            <option value="1" selected>1 Jour (Hybride ENEO + Solaire / Coupures)</option>
+            <option value="1.5">1.5 Jour (Site isolé / Sécurité saison des pluies)</option>
+            <option value="2">2 Jours (Autonomie complète / Site télécom-médical)</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Puissance Panneau PV</label>
+          <select id="solarPanneauWc" onchange="calculerTout()">
+            <option value="450">450 Wc (Monocristallin résidentiel)</option>
+            <option value="550" selected>550 Wc (Tier 1 Half-Cell — Standard marché Cameroun)</option>
+            <option value="600">600 Wc (Grand format industriel)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Barre d'outils rapide -->
+    <div class="quick-toolbar">
+      <div class="library-selector-wrapper">
+        <select id="selectLibrary" class="select-library">
+          <option value="" disabled selected>⚡ Ajouter depuis la bibliothèque d'équipements standard...</option>
+          <optgroup label="💡 Éclairage">
+            <option value="Ampoules LED séjour & ext.;10;0.9;1.0;0.95;6;4">Ampoules LED basse conso (10 W)</option>
+            <option value="Réglette LED 120cm;36;1.0;1.0;0.95;8;2">Réglette LED 120cm (36 W)</option>
+            <option value="Projecteur extérieur LED;100;1.0;1.0;0.95;10;10">Projecteur extérieur sécurité (100 W)</option>
+          </optgroup>
+          <optgroup label="❄️ Climatisation & Froid">
+            <option value="Brasseur d'air plafonnier;65;0.9;1.0;0.90;12;8">Brasseur d'air plafonnier (65 W)</option>
+            <option value="Climatiseur Split 9 000 BTU (1 CV);1000;0.8;0.85;0.85;8;6">Clim 9 000 BTU - 1 CV (1 000 W)</option>
+            <option value="Climatiseur Split 12 000 BTU (1.5 CV);1300;0.8;0.85;0.85;8;6">Clim 12 000 BTU - 1.5 CV (1 300 W)</option>
+            <option value="Climatiseur Split 18 000 BTU (2 CV);2000;0.8;0.85;0.85;8;5">Clim 18 000 BTU - 2 CV (2 000 W)</option>
+            <option value="Réfrigérateur combiné A+;150;0.6;1.0;0.85;24;12">Réfrigérateur combiné (150 W)</option>
+            <option value="Congélateur solaire coffre;200;0.6;1.0;0.85;24;12">Congélateur coffre (200 W)</option>
+          </optgroup>
+          <optgroup label="🖥️ Multimédia & Bureautique">
+            <option value="Téléviseur LED + Décodeur;120;0.8;0.9;0.95;6;4">TV LED + Décodeur TV (120 W)</option>
+            <option value="Poste informatique PC + Écran;250;0.7;0.8;0.90;8;1">PC bureautique (250 W)</option>
+            <option value="Box Internet WiFi / Routeur;25;1.0;1.0;0.95;24;12">Box Internet WiFi (25 W)</option>
+            <option value="Caméras de surveillance DVR;80;1.0;1.0;0.90;24;12">Vidéosurveillance (80 W)</option>
+          </optgroup>
+          <optgroup label="⚙️ Pompage & Autres">
+            <option value="Pompe de surpression eau;750;0.8;0.7;0.80;3;1">Pompe surpresseur 1 CV (750 W)</option>
+            <option value="Pompe de forage solaire (fil du soleil);1100;0.9;1.0;0.85;6;0">Pompe solaire de forage (1 100 W)</option>
+            <option value="Fer à repasser;1500;0.5;0.3;1.0;0.5;0">Fer à repasser (1 500 W)</option>
+            <option value="Micro-ondes;1200;0.4;0.4;0.95;0.5;0.2">Micro-ondes (1 200 W)</option>
+          </optgroup>
+        </select>
+        <button class="btn-add-lib" onclick="ajouterDepuisBibliotheque()">+ Ajouter</button>
+      </div>
+
+      <div class="toolbar-actions-right">
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="gererFichierPhoto(this)">
+        <button class="btn-ai-scan" onclick="ouvrirModalScan()">
+          📷 Scanner Plaque
+        </button>
+        <button class="btn-add-custom" onclick="ajouterLigneVierge()">
+          + Perso
+        </button>
+      </div>
+    </div>
+
+    <!-- Tableau Pleine Largeur avec colonnes spacieuses -->
+    <div class="table-card">
+      <table id="tableDevis">
+        <thead>
+          <tr>
+            <th class="col-desig">Désignation</th>
+            <th style="width: 75px;">Qté</th>
+            <th style="width: 120px;">P. Unit (W)</th>
+            <th style="width: 120px;">P. Total (W)</th>
+            <!-- Colonnes Mode Avancé -->
+            <th class="col-advanced" style="width: 95px; min-width: 95px;" title="Facteur d'utilisation">Ku</th>
+            <th class="col-advanced" style="width: 95px; min-width: 95px;" title="Facteur de simultanéité">Ks</th>
+            <th class="col-advanced" style="width: 95px; min-width: 95px;" title="Facteur de puissance">cos φ</th>
+            <th class="col-advanced" style="width: 130px;" title="Puissance appelée = P.tot x Ku x Ks">P. Appelée (W)</th>
+            <th class="col-advanced" style="width: 130px;" title="Puissance apparente = P.app / cos φ">P. Apparente (VA)</th>
+            <!-- Fin mode avancé -->
+            <th style="width: 95px;">Durée/j (h)</th>
+            <th style="width: 140px;">Énergie/j (Wh)</th>
+            <!-- Colonne Solaire : Conso Nuit -->
+            <th class="col-solar col-solar-head" style="width: 95px;" title="Nombre d'heures de fonctionnement la nuit (sur batteries)">H. Nuit (h)</th>
+            <th class="col-solar col-solar-head" style="width: 140px;" title="Énergie consommée la nuit prélevée sur le parc batteries">Énergie Nuit (Wh)</th>
+            <th style="width: 55px;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="corpsTableau">
+          <!-- Injecté par JS -->
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL GÉNÉRAL</td>
+            <td id="footQte">0</td>
+            <td>—</td>
+            <td class="total-highlight">
+              <span id="footPtW">0</span> W
+              <small>(<span id="footPtKW">0.00</span> kW)</small>
+            </td>
+            <!-- Totaux Avancés -->
+            <td class="col-advanced">—</td>
+            <td class="col-advanced">—</td>
+            <td class="col-advanced">—</td>
+            <td class="col-advanced total-highlight">
+              <span id="footPappW">0</span> W
+              <small>(<span id="footPappKW">0.00</span> kW)</small>
+            </td>
+            <td class="col-advanced total-highlight">
+              <span id="footSva">0</span> VA
+              <small>(<span id="footSkva">0.00</span> kVA)</small>
+            </td>
+            <!-- Fin totaux avancés -->
+            <td>—</td>
+            <td class="total-highlight">
+              <span id="footEwh">0</span> Wh
+              <small>(<span id="footEkwh">0.00</span> kWh/j)</small>
+            </td>
+            <!-- Totaux Solaires -->
+            <td class="col-solar">—</td>
+            <td class="col-solar total-highlight" style="color: var(--solar-dark);">
+              <span id="footEnuitWh">0</span> Wh
+              <small>(<span id="footEnuitKwh">0.00</span> kWh)</small>
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- ── BLOC DE SYNTHÈSE SOLAIRE PLEINE LARGEUR ── -->
+    <section class="solar-dashboard-section">
+      <div class="solar-dashboard-card">
+        <div class="solar-dashboard-header">
+          <h4>☀️ Dimensionnement & Recommandations Solaires</h4>
+          <span class="badge-mode" style="background: #fef3c7; color: #92400e;">Système Hybride / Off-Grid</span>
+        </div>
+
+        <div class="solar-kpis">
+          <div class="solar-kpi-item">
+            <div class="lbl">Puissance Crête Panneaux</div>
+            <div class="val"><span id="solarKpiWc">0</span> Wc</div>
+            <div class="sub">Soit environ <strong id="solarKpiKwc">0.00</strong> kWc de panneaux</div>
+          </div>
+
+          <div class="solar-kpi-item">
+            <div class="lbl">Nombre de Panneaux Solaires</div>
+            <div class="val"><span id="solarKpiNbPanneaux">0</span> <span>unités</span></div>
+            <div class="sub">Module de <strong id="solarKpiPanneauP">550</strong> Wc</div>
+          </div>
+
+          <div class="solar-kpi-item">
+            <div class="lbl">Capacité Batterie Requise</div>
+            <div class="val"><span id="solarKpiCapKwh">0.0</span> <span>kWh</span></div>
+            <div class="sub">Soit <strong id="solarKpiCapAh">0</strong> Ah sous <strong id="solarKpiVoltBatt">48</strong> V</div>
+          </div>
+
+          <div class="solar-kpi-item">
+            <div class="lbl">Onduleur Hybride Conseillé</div>
+            <div class="val"><span id="solarKpiOnduleurKva">0</span> <span>kVA</span></div>
+            <div class="sub">Sortie pure sinus avec MPPT</div>
+          </div>
+        </div>
+
+        <div class="solar-recom-grid">
+          <div class="solar-recom-box">
+            <strong>🔹 Configuration du Champ Solaire</strong>
+            <div class="box-value"><span id="solarPanelsConfig">0 panneaux de 550Wc</span></div>
+            <small style="color: #666;">Surface toiture nécessaire : env. <strong id="solarSurfaceM2">0</strong> m²</small>
+          </div>
+          <div class="solar-recom-box">
+            <strong>🔹 Configuration du Parc Batteries</strong>
+            <div class="box-value"><span id="solarBattConfig">0 module(s) Lithium</span></div>
+            <small style="color: #666;" id="solarBattDetails">Calculé pour l'autonomie choisie</small>
+          </div>
+          <div class="solar-recom-box">
+            <strong>🔹 Régulateur de Charge MPPT</strong>
+            <div class="box-value"><span id="solarMpptConfig">Intégré à l'onduleur</span></div>
+            <small style="color: #666;">Courant de charge estimé : <strong id="solarMpptAmps">0</strong> A</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Synthèse Tableau Général AC Pleine Largeur -->
+    <section>
+      <div class="summary-heading">
+        <h3>⚡ Synthèse & Dimensionnement Tableau Général (AC)</h3>
+        <span class="badge-mode" id="badgeTension">Monophasé 230V</span>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Puissance Totale Installée</div>
+          <div class="kpi-value"><span id="kpiPtot">0.00</span> <span>kW</span></div>
+          <div class="kpi-sub">Somme nominale connectée</div>
+        </div>
+
+        <div class="kpi-card accent-blue">
+          <div class="kpi-label">Puissance Appelée Estimée</div>
+          <div class="kpi-value"><span id="kpiPapp">0.00</span> <span>kVA</span></div>
+          <div class="kpi-sub" id="kpiPappSub">Avec Ku, Ks & cos φ</div>
+        </div>
+
+        <div class="kpi-card accent-amber">
+          <div class="kpi-label">Dimensionnement Recommandé</div>
+          <div class="kpi-value"><span id="kpiSrecom">0.00</span> <span>kVA</span></div>
+          <div class="kpi-sub" id="kpiMargeSub">Avec réserve +20%</div>
+        </div>
+
+        <div class="kpi-card accent-emerald">
+          <div class="kpi-label">Consommation Journalière</div>
+          <div class="kpi-value"><span id="kpiEjour">0.00</span> <span>kWh/j</span></div>
+          <div class="kpi-sub">Soit env. <strong id="kpiEmois">0</strong> kWh/mois</div>
+        </div>
+      </div>
+
+      <div class="technical-specs-card">
+        <div class="specs-title">
+          <span>🛠️ Spécifications du Disjoncteur Principal & Alimentation de Secours</span>
+        </div>
+        <div class="specs-grid">
+          <div class="spec-item highlight">
+            <strong>Courant Maximal Prévu (Ib)</strong>
+            <div class="spec-val"><span id="specCourant">0.0</span> A</div>
+            <small id="specCourantFormule">I = S / U</small>
+          </div>
+          <div class="spec-item">
+            <strong>Calibre Disjoncteur Général Suggéré</strong>
+            <div class="spec-val" style="color: #1e293b;"><span id="specDisjoncteur">16</span> A</div>
+            <small>Courbe C usuelle</small>
+          </div>
+          <div class="spec-item">
+            <strong>Groupe Électrogène / Source secours</strong>
+            <div class="spec-val" style="color: #2563eb;"><span id="specSourceKva">0.0</span> kVA</div>
+            <small>Capacité d'alimentation de secours</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── MODALE SCANNER OCR LOCAL & RECHERCHE NOTICE ── -->
+  <div id="modalScanIA" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📷 Scanner de Plaque (OCR Local & Notice)</h3>
+        <button class="btn-close-modal" onclick="fermerModalScan()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="ocr-status-banner">
+          <div style="font-weight:700; color:#1e3a8a; font-size:0.83rem; display:flex; align-items:center; gap:6px;">
+            <span>⚡ Reconnaissance 100% Locale (Zéro clé API, 100% confidentiel)</span>
+          </div>
+          <p style="font-size:0.75rem; color:#475569; margin-top:3px;">
+            L'analyse de la plaque est effectuée directement par votre navigateur. Vos données et photos ne quittent jamais votre appareil.
+          </p>
+        </div>
+
+        <div class="scan-upload-zone" onclick="document.getElementById('cameraInput').click()">
+          <div style="font-size: 2.2rem; margin-bottom: 6px;">📸</div>
+          <strong style="color: var(--dark-bg); font-size: 0.95rem;">Prendre la photo de la plaque</strong>
+          <p style="color: #64748b; font-size: 0.8rem; margin-top: 4px;">Plaque signalétique moteur, clim, compresseur ou extrait de notice</p>
+        </div>
+
+        <img id="scanPreview" class="scan-preview-img" alt="Aperçu plaque">
+
+        <div id="aiLoading" class="ai-loading-box">
+          <div class="ai-spinner"></div>
+          <strong id="ocrLoadingTitle" style="color: var(--dark-bg);">Reconnaissance OCR en cours...</strong>
+          <p id="ocrLoadingSub" style="color: #64748b; font-size: 0.82rem; margin-top: 4px;">Initialisation du moteur OCR local...</p>
+        </div>
+
+        <div id="aiResultBox" class="ai-result-box">
+          <strong style="color: #1e293b; font-size: 0.84rem;">✅ Données détectées sur la plaque :</strong>
+          <div class="ai-result-grid">
+            <div class="ai-field" style="grid-column: span 2;">
+              <label>Désignation / Modèle</label>
+              <input type="text" id="aiDesig" oninput="document.getElementById('manualSearchQuery').value = this.value;">
+            </div>
+            <div class="ai-field">
+              <label>Puissance (W)</label>
+              <input type="number" id="aiPuissance">
+            </div>
+            <div class="ai-field">
+              <label>cos φ</label>
+              <input type="number" id="aiCosphi" step="0.02" value="0.85">
+            </div>
+            <div class="ai-field">
+              <label>Ku (Utilisation)</label>
+              <input type="number" id="aiKu" step="0.05" value="0.8">
+            </div>
+            <div class="ai-field">
+              <label>Ks (Simultanéité)</label>
+              <input type="number" id="aiKs" step="0.05" value="0.85">
+            </div>
+            <div class="ai-field">
+              <label>Durée/j (h)</label>
+              <input type="number" id="aiDuree" step="0.5" value="8">
+            </div>
+            <div class="ai-field">
+              <label>H. Nuit (h)</label>
+              <input type="number" id="aiDureeNuit" step="0.5" value="4">
+            </div>
+          </div>
+          <div id="aiRemarques" style="font-size: 0.74rem; color: #64748b; margin-top: 6px; font-style: italic;"></div>
+
+          <div style="margin-top: 10px;">
+            <details style="font-size: 0.76rem; color: #64748b;">
+              <summary style="cursor: pointer; font-weight: 600; color: var(--accent);">📄 Voir le texte brut extrait par l'OCR</summary>
+              <textarea id="aiRawText" readonly style="width: 100%; height: 65px; margin-top: 5px; font-family: monospace; font-size: 0.74rem; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff;"></textarea>
+            </details>
+          </div>
+        </div>
+
+        <!-- Recherche directe de notice constructeur (Option C intégrée) -->
+        <div class="manual-search-box">
+          <label style="font-size: 0.78rem; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">
+            🔎 Notice constructeur introuvable ou plaque abîmée ?
+          </label>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="manualSearchQuery" placeholder="Ex: Climatiseur Daikin FTXB35C ou Moteur Leroy Somer" onkeydown="if(event.key==='Enter') rechercherNoticeWeb()">
+            <button type="button" class="btn-search-manual" onclick="rechercherNoticeWeb()">
+              🔍 Trouver la notice
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-header" style="background:#fff; color:#333; border:1px solid #ccc;" onclick="fermerModalScan()">Annuler</button>
+        <button id="btnValiderScan" class="btn-ai-scan" style="display:none;" onclick="validerInsertionScan()">
+          ➕ Insérer dans le tableau
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Pleine Largeur -->
+  <footer class="main-footer">
+    Bilan & Dimensionnement Électrique — <strong>Bold Technology & Engineering</strong> &copy; 2026. Tous droits réservés.
+  </footer>
+
+  <div id="toast" class="toast">Sauvegarde effectuée.</div>
+
+  <script>
+    window.onload = function() {
+      const dateEl = document.getElementById("projDate");
+      if (!dateEl.value) {
+        dateEl.value = new Date().toISOString().split('T')[0];
+      }
+      chargerLocal();
+    };
+
+    function toggleModeSolaire() {
+      const isSolar = document.getElementById("toggleSolar").checked;
+      if (isSolar) {
+        document.body.classList.add("show-solar");
+      } else {
+        document.body.classList.remove("show-solar");
+      }
+      calculerTout();
+      sauvegarderLocal();
+    }
+
+    function toggleModeAvance() {
+      const isAdv = document.getElementById("toggleAdvanced").checked;
+      if (isAdv) {
+        document.body.classList.add("show-advanced");
+      } else {
+        document.body.classList.remove("show-advanced");
+      }
+      sauvegarderLocal();
+    }
+
+    function ajouterDepuisBibliotheque() {
+      const select = document.getElementById("selectLibrary");
+      const val = select.value;
+      if (!val) return;
+
+      const [desig, p, ku, ks, cosphi, duree, dureeNuit] = val.split(";");
+      insererLigneTableau(
+        desig,
+        1,
+        parseFloat(p),
+        parseFloat(ku),
+        parseFloat(ks),
+        parseFloat(cosphi),
+        parseFloat(duree),
+        parseFloat(dureeNuit || Math.min(duree, 4))
+      );
+      calculerTout();
+      afficherToast(`Ajouté : ${desig}`);
+    }
+
+    function ajouterLigneVierge() {
+      const ligne = insererLigneTableau("", "", "", "", "", "", "", "");
+      ligne.querySelector(".row-desig").focus();
+      calculerTout();
+    }
+
+    function insererLigneTableau(desig, qte, p, ku, ks, cosphi, duree, dureeNuit) {
+      const tbody = document.getElementById("corpsTableau");
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td><input type="text" class="tbl-input left-align row-desig" value="${desig}" placeholder="Nom de l'équipement" oninput="calculerTout()"></td>
+        <td><input type="number" class="tbl-input compact row-qte" min="0" value="${qte}" oninput="calculerTout()"></td>
+        <td><input type="number" class="tbl-input row-p" min="0" step="10" value="${p}" oninput="calculerTout()"></td>
+        <td class="val-cell row-pt-w">0</td>
+        
+        <td class="col-advanced"><input type="number" class="tbl-input compact row-ku" min="0.1" max="1" step="0.05" value="${ku}" oninput="calculerTout()"></td>
+        <td class="col-advanced"><input type="number" class="tbl-input compact row-ks" min="0.1" max="1" step="0.05" value="${ks}" oninput="calculerTout()"></td>
+        <td class="col-advanced"><input type="number" class="tbl-input compact row-cosphi" min="0.5" max="1" step="0.02" value="${cosphi}" oninput="calculerTout()"></td>
+        <td class="col-advanced val-cell row-papp-w">0</td>
+        <td class="col-advanced val-cell row-s-va">0</td>
+        
+        <td><input type="number" class="tbl-input row-duree" min="0" max="24" step="0.5" value="${duree}" oninput="ajusterDureeNuit(this); calculerTout()"></td>
+        <td class="val-cell row-e-wh">0</td>
+
+        <td class="col-solar"><input type="number" class="tbl-input row-duree-nuit" min="0" max="24" step="0.5" value="${dureeNuit}" oninput="calculerTout()"></td>
+        <td class="col-solar val-cell row-e-nuit-wh" style="color: var(--solar-dark);">0</td>
+
+        <td><button class="btn-row-del" onclick="supprimerLigne(this)" title="Supprimer">✕</button></td>
+      `;
+
+      tbody.appendChild(tr);
+      return tr;
+    }
+
+    function ajusterDureeNuit(inputDuree) {
+      const tr = inputDuree.closest("tr");
+      const inputNuit = tr.querySelector(".row-duree-nuit");
+      const totH = parseFloat(inputDuree.value) || 0;
+      if (parseFloat(inputNuit.value) > totH) {
+        inputNuit.value = totH;
+      }
+    }
+
+    function supprimerLigne(btn) {
+      const tr = btn.closest("tr");
+      tr.remove();
+      calculerTout();
+    }
+
+    function reinitialiserBilan() {
+      if (confirm("Voulez-vous vraiment vider le tableau pour recommencer ?")) {
+        document.getElementById("corpsTableau").innerHTML = "";
+        calculerTout();
+        sauvegarderLocal();
+        afficherToast("Tableau réinitialisé");
+      }
+    }
+
+    function calculerTout() {
+      const rows = document.querySelectorAll("#corpsTableau tr");
+
+      let totalQte = 0;
+      let totalPtW = 0;
+      let totalPappW = 0;
+      let totalSVa = 0;
+      let totalEWh = 0;
+      let totalENuitWh = 0;
+
+      rows.forEach(r => {
+        const qte = parseFloat(r.querySelector(".row-qte").value) || 0;
+        const p = parseFloat(r.querySelector(".row-p").value) || 0;
+        const ku = parseFloat(r.querySelector(".row-ku").value) || 1.0;
+        const ks = parseFloat(r.querySelector(".row-ks").value) || 1.0;
+        const cosphi = parseFloat(r.querySelector(".row-cosphi").value) || 0.9;
+        const duree = parseFloat(r.querySelector(".row-duree").value) || 0;
+        const dureeNuit = Math.min(duree, parseFloat(r.querySelector(".row-duree-nuit").value) || 0);
+
+        const ptW = qte * p;
+        const pappW = ptW * ku * ks;
+        const sVa = cosphi > 0 ? (pappW / cosphi) : pappW;
+        const eWh = ptW * duree;
+        const eNuitWh = ptW * dureeNuit;
+
+        r.querySelector(".row-pt-w").textContent = Math.round(ptW);
+        r.querySelector(".row-papp-w").textContent = Math.round(pappW);
+        r.querySelector(".row-s-va").textContent = Math.round(sVa);
+        r.querySelector(".row-e-wh").textContent = Math.round(eWh);
+        r.querySelector(".row-e-nuit-wh").textContent = Math.round(eNuitWh);
+
+        totalQte += qte;
+        totalPtW += ptW;
+        totalPappW += pappW;
+        totalSVa += sVa;
+        totalEWh += eWh;
+        totalENuitWh += eNuitWh;
+      });
+
+      document.getElementById("footQte").textContent = totalQte;
+      document.getElementById("footPtW").textContent = Math.round(totalPtW).toLocaleString('fr-FR');
+      document.getElementById("footPtKW").textContent = (totalPtW / 1000).toFixed(2);
+
+      document.getElementById("footPappW").textContent = Math.round(totalPappW).toLocaleString('fr-FR');
+      document.getElementById("footPappKW").textContent = (totalPappW / 1000).toFixed(2);
+
+      document.getElementById("footSva").textContent = Math.round(totalSVa).toLocaleString('fr-FR');
+      document.getElementById("footSkva").textContent = (totalSVa / 1000).toFixed(2);
+
+      document.getElementById("footEwh").textContent = Math.round(totalEWh).toLocaleString('fr-FR');
+      document.getElementById("footEkwh").textContent = (totalEWh / 1000).toFixed(2);
+
+      document.getElementById("footEnuitWh").textContent = Math.round(totalENuitWh).toLocaleString('fr-FR');
+      document.getElementById("footEnuitKwh").textContent = (totalENuitWh / 1000).toFixed(2);
+
+      // AC
+      const tension = parseFloat(document.getElementById("tensionReseau").value) || 230;
+      const marge = parseFloat(document.getElementById("margeExtension").value) || 1.20;
+      const isTri = tension === 400;
+
+      document.getElementById("badgeTension").textContent = isTri ? "Triphasé 400V (3P+N)" : "Monophasé 230V";
+
+      const sKva = totalSVa / 1000;
+      const sRecomKva = sKva * marge;
+
+      document.getElementById("kpiPtot").textContent = (totalPtW / 1000).toFixed(2);
+      document.getElementById("kpiPapp").textContent = sKva.toFixed(2);
+      document.getElementById("kpiSrecom").textContent = sRecomKva.toFixed(2);
+      document.getElementById("kpiMargeSub").textContent = `Avec réserve +${Math.round((marge - 1)*100)}%`;
+
+      const eJourKwh = totalEWh / 1000;
+      document.getElementById("kpiEjour").textContent = eJourKwh.toFixed(1);
+      document.getElementById("kpiEmois").textContent = Math.round(eJourKwh * 30);
+
+      let courantA = 0;
+      if (isTri) {
+        courantA = (totalSVa * marge) / (400 * Math.sqrt(3));
+        document.getElementById("specCourantFormule").textContent = `I = S_recom / (400V × √3)`;
+      } else {
+        courantA = (totalSVa * marge) / 230;
+        document.getElementById("specCourantFormule").textContent = `I = S_recom / 230V`;
+      }
+      document.getElementById("specCourant").textContent = courantA > 0 ? courantA.toFixed(1) : "0.0";
+
+      const calibresNormalises = [10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 630];
+      let disjCalibre = calibresNormalises.find(c => c >= courantA) || "> 630";
+      document.getElementById("specDisjoncteur").textContent = disjCalibre;
+      document.getElementById("specSourceKva").textContent = sRecomKva > 0 ? Math.ceil(sRecomKva) : "0";
+
+      // SOLAIRE (Standards Cameroun)
+      const hps = parseFloat(document.getElementById("solarHps").value) || 4.5;
+      const uBatt = parseFloat(document.getElementById("solarTensionBatt").value) || 48;
+      const [dodStr, rdtStr, techNom] = (document.getElementById("solarTechBatt").value || "0.85;0.95;LiFePO4").split(";");
+      const dod = parseFloat(dodStr) || 0.85;
+      const rdtBatt = parseFloat(rdtStr) || 0.95;
+      const autonomie = parseFloat(document.getElementById("solarAutonomie").value) || 1.0;
+      const pPanneauWc = parseFloat(document.getElementById("solarPanneauWc").value) || 550;
+      const pr = 0.75;
+
+      const pCreteWc = totalEWh > 0 ? (totalEWh / (hps * pr)) : 0;
+      const nbPanneaux = pPanneauWc > 0 ? Math.ceil(pCreteWc / pPanneauWc) : 0;
+      const surfaceEstimee = (nbPanneaux * 2.5).toFixed(1);
+
+      document.getElementById("solarKpiWc").textContent = Math.round(pCreteWc).toLocaleString('fr-FR');
+      document.getElementById("solarKpiKwc").textContent = (pCreteWc / 1000).toFixed(2);
+      document.getElementById("solarKpiNbPanneaux").textContent = nbPanneaux;
+      document.getElementById("solarKpiPanneauP").textContent = pPanneauWc;
+      document.getElementById("solarPanelsConfig").textContent = `${nbPanneaux} panneaux solaires de ${pPanneauWc} Wc`;
+      document.getElementById("solarSurfaceM2").textContent = surfaceEstimee;
+
+      const energieNuitCalcul = totalENuitWh > 0 ? totalENuitWh : (totalEWh * 0.5);
+      const capaciteStockageWh = (energieNuitCalcul * autonomie) / (dod * rdtBatt);
+      const capaciteStockageKwh = capaciteStockageWh / 1000;
+      const capaciteStockageAh = uBatt > 0 ? (capaciteStockageWh / uBatt) : 0;
+
+      document.getElementById("solarKpiCapKwh").textContent = capaciteStockageKwh.toFixed(1);
+      document.getElementById("solarKpiCapAh").textContent = Math.round(capaciteStockageAh);
+      document.getElementById("solarKpiVoltBatt").textContent = uBatt;
+
+      let configBatterieTxt = "";
+      if (techNom === "LiFePO4") {
+        const kwhParModule = (uBatt * 100) / 1000;
+        const nbModulesLi = Math.max(1, Math.ceil(capaciteStockageKwh / kwhParModule));
+        configBatterieTxt = `${nbModulesLi} module(s) Lithium ${uBatt}V 100Ah (Rack / Mural)`;
+      } else {
+        const nbBatteriesGel = Math.max(uBatt / 12, Math.ceil(capaciteStockageKwh / (2.4 * dod)));
+        configBatterieTxt = `${nbBatteriesGel} batteries GEL 12V 200Ah`;
+      }
+      document.getElementById("solarBattConfig").textContent = configBatterieTxt;
+      document.getElementById("solarBattDetails").textContent = `Stockage ${techNom} sous ${uBatt}V (${autonomie}j autonomie)`;
+
+      const puissanceOnduleurVa = totalSVa * 1.25;
+      const kvaOnduleursDispos = [1, 2, 3, 5, 8, 10, 12, 15, 20];
+      const onduleurRecomKva = kvaOnduleursDispos.find(k => (k * 1000) >= puissanceOnduleurVa) || Math.ceil(puissanceOnduleurVa / 1000);
+
+      document.getElementById("solarKpiOnduleurKva").textContent = onduleurRecomKva || 3;
+
+      const mpptAmps = uBatt > 0 ? Math.round(pCreteWc / uBatt) : 0;
+      document.getElementById("solarMpptAmps").textContent = mpptAmps;
+      document.getElementById("solarMpptConfig").textContent = `MPPT ${uBatt}V / min. ${Math.ceil(mpptAmps * 1.15)}A`;
+
+      sauvegarderLocal();
+    }
+
+    let ocrWorkerInstance = null;
+    let ocrWorkerPromise = null;
+    let ocrProgressCallback = null;
+
+    // Initialisation et pré-chauffage d'un Worker OCR ultra-rapide (modèle fast sur CDN mondial)
+    function getOCRWorker() {
+      if (ocrWorkerInstance) return Promise.resolve(ocrWorkerInstance);
+      if (ocrWorkerPromise) return ocrWorkerPromise;
+
+      ocrWorkerPromise = (async () => {
+        const worker = await Tesseract.createWorker("eng", 1, {
+          workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js",
+          corePath: "https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js",
+          langPath: "https://cdn.jsdelivr.net/gh/naptha/tessdata@gh-pages/4.0.0_fast",
+          logger: m => {
+            if (ocrProgressCallback) ocrProgressCallback(m);
+          }
+        });
+
+        // Optimisations techniques : mode sparse text + restriction aux caractères techniques utiles
+        try {
+          await worker.setParameters({
+            tessedit_pageseg_mode: "11",
+            tessedit_char_whitelist: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.:,/-()+= "
+          });
+        } catch (e) {}
+
+        ocrWorkerInstance = worker;
+        return worker;
+      })().catch(err => {
+        ocrWorkerPromise = null;
+        throw err;
+      });
+
+      return ocrWorkerPromise;
+    }
+
+    function ouvrirModalScan() {
+      document.getElementById("modalScanIA").style.display = "flex";
+      // Pré-chauffage immédiat dès l'ouverture de la modale
+      getOCRWorker().catch(e => console.log("Pré-chargement OCR...", e));
+    }
+
+    function fermerModalScan() {
+      document.getElementById("modalScanIA").style.display = "none";
+      document.getElementById("scanPreview").style.display = "none";
+      document.getElementById("aiLoading").style.display = "none";
+      document.getElementById("aiResultBox").style.display = "none";
+      document.getElementById("btnValiderScan").style.display = "none";
+      document.getElementById("cameraInput").value = "";
+    }
+
+    function rechercherNoticeWeb() {
+      const query = (document.getElementById("manualSearchQuery").value || document.getElementById("aiDesig").value || "").trim();
+      if (!query) {
+        alert("Veuillez saisir la référence, la marque ou le modèle de l'appareil (ex: Daikin FTXB35C).");
+        return;
+      }
+      const url = `https://www.google.com/search?q=${encodeURIComponent(query + " fiche technique notice puissance watt pdf")}`;
+      window.open(url, "_blank");
+    }
+
+    // Préparation haute précision de l'image (1200px pour lire parfaitement les petites références et chiffres)
+    function preparerImagePourOCR(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            // Résolution 1200px : clarté optimale pour les petits caractères (Modèles, Watts, Ampères)
+            const maxDim = 1200;
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+              else { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+
+            ctx.drawImage(img, 0, 0, w, h);
+
+            // Niveaux de gris naturels et rehaussement doux de contraste pour isoler le texte imprimé/gravé
+            const imgData = ctx.getImageData(0, 0, w, h);
+            const d = imgData.data;
+            for (let i = 0; i < d.length; i += 4) {
+              const gray = (d[i] * 77 + d[i+1] * 150 + d[i+2] * 29) >> 8;
+              // Contraste doux sans seuil dur (préserve les ombres et les détails fins)
+              const c = 1.2;
+              const val = Math.min(255, Math.max(0, ((gray - 128) * c) + 128));
+              d[i] = val;
+              d[i+1] = val;
+              d[i+2] = val;
+            }
+            ctx.putImageData(imgData, 0, 0);
+
+            resolve({
+              canvas: canvas,
+              previewUrl: canvas.toDataURL("image/jpeg", 0.88)
+            });
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function gererFichierPhoto(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      try {
+        const prep = await preparerImagePourOCR(file);
+        const prev = document.getElementById("scanPreview");
+        prev.src = prep.previewUrl;
+        prev.style.display = "block";
+        analyserPlaqueLocaleOCR(prep.previewUrl);
+      } catch (e) {
+        alert("Erreur lors de la préparation de la photo : " + (e.message || e));
+      }
+    }
+
+    async function analyserPlaqueLocaleOCR(imageUri) {
+      const loading = document.getElementById("aiLoading");
+      const titleEl = document.getElementById("ocrLoadingTitle");
+      const subEl = document.getElementById("ocrLoadingSub");
+      const resultBox = document.getElementById("aiResultBox");
+      const btnVal = document.getElementById("btnValiderScan");
+
+      loading.style.display = "block";
+      resultBox.style.display = "none";
+      btnVal.style.display = "none";
+      titleEl.textContent = "Analyse ultra-rapide en cours...";
+      subEl.textContent = "Lecture locale (0%)...";
+
+      if (typeof Tesseract === "undefined") {
+        loading.style.display = "none";
+        resultBox.style.display = "block";
+        btnVal.style.display = "flex";
+        document.getElementById("aiRemarques").textContent = "⚠️ Bibliothèque OCR non disponible. Vous pouvez saisir les valeurs ci-dessus ou lancer la recherche de notice.";
+        return;
+      }
+
+      // Connexion de la jauge de progression en temps réel
+      ocrProgressCallback = m => {
+        if (m.status === "recognizing text" && m.progress !== undefined) {
+          subEl.textContent = `Lecture des chiffres : ${Math.round(m.progress * 100)}%`;
+        } else if (m.status === "loading language traineddata") {
+          subEl.textContent = "Chargement du modèle rapide...";
+        } else if (m.status) {
+          subEl.textContent = m.status;
+        }
+      };
+
+      try {
+        const worker = await getOCRWorker();
+        const ret = await worker.recognize(imageUri);
+        const rawText = (ret && ret.data && ret.data.text) ? ret.data.text : "";
+        document.getElementById("aiRawText").value = rawText;
+
+        const data = extraireCaracteristiquesElectriques(rawText);
+
+        document.getElementById("aiDesig").value = data.desig;
+        document.getElementById("aiPuissance").value = data.puissanceW;
+        document.getElementById("aiCosphi").value = data.cosphi;
+        document.getElementById("aiKu").value = data.ku;
+        document.getElementById("aiKs").value = data.ks;
+        document.getElementById("aiDuree").value = data.duree;
+        document.getElementById("aiDureeNuit").value = data.dureeNuit;
+        document.getElementById("aiRemarques").textContent = data.remarques;
+
+        // Pré-remplir le champ de recherche de notice avec Marque + Modèle + Numéro de série
+        document.getElementById("manualSearchQuery").value = data.noticeQuery || data.desig;
+
+        loading.style.display = "none";
+        resultBox.style.display = "block";
+        btnVal.style.display = "flex";
+        afficherToast("Plaque analysée avec succès !");
+
+      } catch (err) {
+        console.error("Erreur OCR Tesseract", err);
+        loading.style.display = "none";
+        resultBox.style.display = "block";
+        btnVal.style.display = "flex";
+
+        const errDetail = (err && (err.message || err.statusText)) || (typeof err === "string" ? err : "Erreur de traitement");
+        document.getElementById("aiRemarques").textContent = `⚠️ Analyse automatique interrompue (${errDetail}). Saisissez la puissance directement ou utilisez le bouton 'Trouver la notice'.`;
+        afficherToast("Saisie manuelle / recherche de notice disponible");
+      }
+    }
+
+    // Heuristiques d'ingénierie électrique pour extraire les paramètres clés
+    function extraireCaracteristiquesElectriques(text) {
+      const clean = (text || "").replace(/\r/g, " ").trim();
+      const upper = clean.toUpperCase();
+
+      let pWatts = 0;
+      let cosphi = 0.85;
+      let remarques = [];
+      let typeAppareil = "";
+      let marque = "";
+      let modele = "";
+
+      // 1. Détection cos phi / PF
+      const cosMatch = upper.match(/(?:COS\s*[\u03C6\u03A6PØϕ]?|PF|POWER\s*FACTOR)\s*[:=]?\s*(0[.,]\d{1,2})/);
+      if (cosMatch) {
+        cosphi = parseFloat(cosMatch[1].replace(",", "."));
+        remarques.push(`cos φ détecté : ${cosphi}`);
+      }
+
+      // 2. Détection Puissance Composée VA / Watts (ex: 750VA/600W, 1000VA / 800W, 3000W/3000VA)
+      const vaW = upper.match(/(\d+(?:[.,]\d+)?)\s*VA\s*[\/\\\-]\s*(\d+(?:[.,]\d+)?)\s*W\b/);
+      const wVA = upper.match(/(\d+(?:[.,]\d+)?)\s*W\s*[\/\\\-]\s*(\d+(?:[.,]\d+)?)\s*VA\b/);
+      if (vaW) {
+        pWatts = Math.round(parseFloat(vaW[2].replace(",", ".")));
+        remarques.push(`Puissance nominale : ${pWatts} W (${vaW[1]} VA)`);
+      } else if (wVA) {
+        pWatts = Math.round(parseFloat(wVA[1].replace(",", ".")));
+        remarques.push(`Puissance nominale : ${pWatts} W (${wVA[2]} VA)`);
+      }
+
+      // 3. Détection Watts directs (ex: "Rated power : 600W", "Puissance: 1500 W", "350W")
+      if (!pWatts) {
+        // En priorité avec ancre de puissance
+        const wMatchAnchor = upper.match(/(?:RATED\s*POWER|PUISSANCE|POWER|INPUT|OUTPUT|CHARGE|CAPACITY|MAX\s*POWER|P\.?NOM)\s*[:=]?\s*(\d+(?:[.,]\d+)?)\s*(?:W\b|WATTS?\b)/);
+        if (wMatchAnchor) {
+          pWatts = Math.round(parseFloat(wMatchAnchor[1].replace(",", ".")));
+          remarques.push(`Puissance directe : ${pWatts} W`);
+        } else {
+          // Sans ancre directe (premier motif xx W isolé)
+          const wMatch = upper.match(/\b(\d{2,5}(?:[.,]\d+)?)\s*(?:W\b|WATTS?\b)/);
+          if (wMatch) {
+            pWatts = Math.round(parseFloat(wMatch[1].replace(",", ".")));
+            remarques.push(`Puissance relevée : ${pWatts} W`);
+          }
+        }
+      }
+
+      // 4. Détection Kilowatts (ex: 1.5 kW, 2,2 kW)
+      if (!pWatts) {
+        const kwMatch = upper.match(/(?:RATED\s*POWER|PUISSANCE|POWER|INPUT|OUTPUT)?\s*[:=]?\s*(\d+(?:[.,]\d+)?)\s*KW\b/);
+        if (kwMatch) {
+          pWatts = Math.round(parseFloat(kwMatch[1].replace(",", ".")) * 1000);
+          remarques.push(`Puissance convertie : ${pWatts} W (depuis kW)`);
+        }
+      }
+
+      // 5. Détection Puissance Apparente seule (ex: 750 VA, 1000 VA -> calcul P = S * cos phi)
+      if (!pWatts) {
+        const vaMatch = upper.match(/(?:RATED\s*POWER|PUISSANCE|POWER|CAPACITY|S)?\s*[:=]?\s*(\d{2,5})\s*VA\b/);
+        if (vaMatch) {
+          const vaVal = parseFloat(vaMatch[1]);
+          pWatts = Math.round(vaVal * cosphi);
+          remarques.push(`Calculé depuis ${vaVal} VA × ${cosphi} : ${pWatts} W`);
+        }
+      }
+
+      // 6. Détection BTU (Climatiseurs, ex: 12000 BTU, 9 000 BTU)
+      if (!pWatts) {
+        const btuMatch = upper.match(/(\d{1,2}[\s.,]?\d{3})\s*BTU/);
+        if (btuMatch) {
+          const btuVal = parseInt(btuMatch[1].replace(/[\s.,]/g, ""), 10);
+          if (btuVal <= 10000) pWatts = 1000;
+          else if (btuVal <= 14000) pWatts = 1300;
+          else if (btuVal <= 20000) pWatts = 2000;
+          else pWatts = Math.round(btuVal * 0.11);
+          remarques.push(`Climatiseur ${btuVal} BTU ~ ${pWatts} W absorbés`);
+        }
+      }
+
+      // 7. Détection CV / HP (Moteurs & pompes, ex: 1.5 CV, 2 HP)
+      if (!pWatts) {
+        const hpMatch = upper.match(/(\d+(?:[.,]\d+)?)\s*(?:CV|HP|CH)\b/);
+        if (hpMatch) {
+          const hpVal = parseFloat(hpMatch[1].replace(",", "."));
+          pWatts = Math.round(hpVal * 1000); // 1 CV électrique ~ 1000W absorbés avec pertes
+          remarques.push(`Moteur ${hpVal} CV ~ ${pWatts} W absorbés`);
+        }
+      }
+
+      // 8. Détection Tension (V) et Courant (A) si Watts absents : P = U * I * cos phi
+      if (!pWatts) {
+        const vMatch = upper.match(/(\d{2,3})\s*V(?:OLTS?|AC|DC)?\b/);
+        const aMatch = upper.match(/(\d+(?:[.,]\d+)?)\s*A(?:MP(?:ERES?)?)?\b/);
+        if (aMatch) {
+          const volts = vMatch ? parseFloat(vMatch[1]) : 230;
+          const amps = parseFloat(aMatch[1].replace(",", "."));
+          pWatts = Math.round(volts * amps * cosphi);
+          remarques.push(`Calculé : ${volts}V × ${amps}A × ${cosphi} = ${pWatts} W`);
+        }
+      }
+
+      if (!pWatts) pWatts = 500; // Valeur indicative par défaut
+
+      // 9. Identification de la marque connue avec tolérance aux artefacts OCR (logos circulaires, coupures)
+      const brandsMap = [
+        { pattern: /(?:FELICITY|ELICITY|LICITY)/i, name: "Felicitysolar" },
+        { pattern: /(?:GROWATT|ROWATT)/i, name: "Growatt" },
+        { pattern: /\bDEYE\b/i, name: "Deye" },
+        { pattern: /VICTRON/i, name: "Victron" },
+        { pattern: /SCHNEIDER/i, name: "Schneider" },
+        { pattern: /HUAWEI/i, name: "Huawei" },
+        { pattern: /SUNSYNK/i, name: "SunSynk" },
+        { pattern: /\bMUST\b/i, name: "Must Solar" },
+        { pattern: /\bSRNE\b/i, name: "SRNE" },
+        { pattern: /EASTMAN/i, name: "Eastman" },
+        { pattern: /LUMINOUS/i, name: "Luminous" },
+        { pattern: /(?:HIKVISION|IKVISION)/i, name: "Hikvision" },
+        { pattern: /\bDAHUA\b/i, name: "Dahua" },
+        { pattern: /DAIKIN/i, name: "Daikin" },
+        { pattern: /CARRIER/i, name: "Carrier" },
+        { pattern: /MIDEA/i, name: "Midea" },
+        { pattern: /\bGREE\b/i, name: "Gree" },
+        { pattern: /SAMSUNG/i, name: "Samsung" },
+        { pattern: /\bLG\b/i, name: "LG" },
+        { pattern: /PANASONIC/i, name: "Panasonic" },
+        { pattern: /PHILIPS/i, name: "Philips" },
+        { pattern: /SONY/i, name: "Sony" },
+        { pattern: /LEGRAND/i, name: "Legrand" },
+        { pattern: /\bABB\b/i, name: "ABB" },
+        { pattern: /SIEMENS/i, name: "Siemens" },
+        { pattern: /HAGER/i, name: "Hager" },
+        { pattern: /SOCOMEC/i, name: "Socomec" },
+        { pattern: /\bAPC\b/i, name: "APC" },
+        { pattern: /EATON/i, name: "Eaton" }
+      ];
+
+      for (const b of brandsMap) {
+        if (b.pattern.test(upper)) {
+          marque = b.name;
+          break;
+        }
+      }
+
+      let sn = "";
+      const isElecSpec = str => /^(?:\d+VAC|\d+VDC|\d+V|\d+HZ|\d+A|\d+AMAX|\d+MAX|\d+W|\d+VA|\d+KVA|\d+KW)$/i.test(str);
+
+      // 10. Extraction du Modèle / Référence exacte (tolérance aux séparateurs et typos OCR : Model, Modet, Mode, etc.)
+      const modelMatch = clean.match(/(?:MODE[LT1!]?|MOD[EÈ]LE?|\bMOD\b|M\/N|\bTYPE\b|\bREF(?:[EÉ]RENCE)?\b|ITEM\s*NO|\bCODE\b)\s*[:;.,'\-]?\s*([A-Za-z0-9\-_/]{3,30})/i);
+      if (modelMatch && !isElecSpec(modelMatch[1])) {
+        modele = modelMatch[1].trim();
+      }
+
+      // 11. Extraction du Numéro de Série (S/N, Serial No, etc.)
+      const snMatch = clean.match(/(?:SERIAL\s*NUMBER|SERIAL(?:\s*NO\.?)?|SER\.?\s*NO\.?|N°\s*S[EÉ]RIE|\bS\/?N\b|\bSERIAL\b)\s*[:;.,'\-]?\s*([A-Za-z0-9\-_]{4,30})/i);
+      if (snMatch && !isElecSpec(snMatch[1])) {
+        sn = snMatch[1].trim();
+        remarques.push(`N° série relevé : ${sn}`);
+      }
+
+      // 12. Détection d'un code produit autonome si aucun mot-clé explicite n'a été lu
+      if (!modele) {
+        const lignes = clean.split("\n").map(l => l.trim());
+        for (const ligne of lignes) {
+          const words = ligne.split(/\s+/);
+          for (const w of words) {
+            const m = w.match(/^([A-Z]{2,6}\d{3,8}[A-Z0-9\-_]*|[A-Z0-9]{2,6}[-_][A-Z0-9\-_]{2,20})$/i);
+            if (m && !isElecSpec(m[1]) && m[1] !== sn) {
+              modele = m[1];
+              break;
+            }
+          }
+          if (modele) break;
+        }
+      }
+
+      // 13. Détection intelligente du type d'équipement & coefficients Ku, Ks, durées
+      let ku = 0.8, ks = 0.85, duree = 8, dureeNuit = 4;
+
+      if (/(?:CLIM|SPLIT|AIR\s*COND|BTU)/i.test(upper)) {
+        typeAppareil = upper.includes("INVERTER") ? "Climatiseur Inverter" : "Climatiseur";
+        ku = 0.8; ks = 0.85; duree = 8; dureeNuit = 6;
+      } else if (/(?:REFRIG|FRIGO|FREEZER|CONGEL)/i.test(upper)) {
+        typeAppareil = "Réfrigérateur / Congélateur";
+        ku = 0.6; ks = 1.0; duree = 24; dureeNuit = 12;
+      } else if (/(?:DVR\b|NVR\b|RECORDER|CAMERA|CCTV|VIDEO\s*RECORDER)/i.test(upper)) {
+        typeAppareil = "Enregistreur DVR / NVR";
+        ku = 1.0; ks = 1.0; duree = 24; dureeNuit = 12;
+      } else if (/(?:IVPS|INVERTER|ONDULEUR|CONVERTISSEUR|SOLAR|HYBRID|UPS\b|DC\s*INPUT|AC\s*OUTPUT)/i.test(upper)) {
+        typeAppareil = "Onduleur Solaire";
+        ku = 0.9; ks = 1.0; duree = 24; dureeNuit = 12;
+      } else if (upper.includes("COMPUTER") || upper.includes("PC") || upper.includes("ORDINATEUR") || upper.includes("DESKTOP") || upper.includes("LAPTOP")) {
+        typeAppareil = "Poste informatique";
+        ku = 0.7; ks = 0.85; duree = 8; dureeNuit = 1;
+      } else if (upper.includes("TV") || upper.includes("TELEVISION") || upper.includes("DECODEUR")) {
+        typeAppareil = "Téléviseur LED";
+        ku = 0.8; ks = 0.90; duree = 6; dureeNuit = 4;
+      } else if (upper.includes("PUMP") || upper.includes("POMPE") || upper.includes("MOTOR") || upper.includes("MOTEUR")) {
+        typeAppareil = "Pompe / Moteur";
+        ku = 0.85; ks = 0.80; duree = 4; dureeNuit = 0;
+      } else if (upper.includes("LED") || upper.includes("LAMP") || upper.includes("LIGHT") || upper.includes("ECLAIRAGE")) {
+        typeAppareil = "Éclairage LED";
+        ku = 1.0; ks = 0.90; duree = 6; dureeNuit = 4;
+      }
+
+      // Construction de la désignation complète
+      const compDesig = [];
+      if (typeAppareil) compDesig.push(typeAppareil);
+      if (marque) compDesig.push(marque);
+      if (modele) compDesig.push(modele);
+      if (sn && !modele) compDesig.push("S/N: " + sn);
+      else if (sn && modele) compDesig.push(`(S/N: ${sn})`);
+
+      let desigFinale = compDesig.join(" ");
+
+      // Si ni type ni marque ni modèle n'ont été détectés, chercher la première ligne informative
+      if (!desigFinale) {
+        const lignesUtiles = clean.split("\n")
+          .map(l => l.trim())
+          .filter(l => l.length > 3 && !/CE|ROHS|MADE IN|CAUTION|WARNING/i.test(l));
+        if (lignesUtiles.length > 0) {
+          desigFinale = lignesUtiles[0].slice(0, 35);
+        } else {
+          desigFinale = "Équipement scanné";
+        }
+      }
+
+      // Requête précise pour le champ de recherche de notice : Marque + Modèle + Numéro de série
+      const compNotice = [];
+      if (marque) compNotice.push(marque);
+      if (modele) compNotice.push(modele);
+      if (sn) compNotice.push("SN " + sn);
+      if (!marque && !modele && typeAppareil) compNotice.push(typeAppareil);
+
+      const noticeQuery = compNotice.join(" ") || desigFinale;
+
+      return {
+        desig: desigFinale,
+        noticeQuery: noticeQuery,
+        modele: modele,
+        sn: sn,
+        puissanceW: pWatts,
+        cosphi: cosphi,
+        ku: ku,
+        ks: ks,
+        duree: duree,
+        dureeNuit: dureeNuit,
+        remarques: remarques.join(" | ") || "Vérifiez les valeurs extraites de la plaque"
+      };
+    }
+
+    function validerInsertionScan() {
+      const desig = document.getElementById("aiDesig").value || "Appareil scanné";
+      const p = parseFloat(document.getElementById("aiPuissance").value) || 100;
+      const cosphi = parseFloat(document.getElementById("aiCosphi").value) || 0.85;
+      const ku = parseFloat(document.getElementById("aiKu").value) || 0.8;
+      const ks = parseFloat(document.getElementById("aiKs").value) || 0.85;
+      const duree = parseFloat(document.getElementById("aiDuree").value) || 8;
+      const dureeNuit = parseFloat(document.getElementById("aiDureeNuit").value) || 4;
+
+      insererLigneTableau(desig, 1, p, ku, ks, cosphi, duree, dureeNuit);
+      calculerTout();
+      fermerModalScan();
+      afficherToast(`Ajouté : ${desig}`);
+    }
+
+    function sauvegarderLocal() {
+      const dataToSave = {
+        client: document.getElementById("projClient").value,
+        nom: document.getElementById("projNom").value,
+        site: document.getElementById("projSite").value,
+        date: document.getElementById("projDate").value,
+        tension: document.getElementById("tensionReseau").value,
+        marge: document.getElementById("margeExtension").value,
+        isAdvanced: document.getElementById("toggleAdvanced").checked,
+        isSolar: document.getElementById("toggleSolar").checked,
+        solarHps: document.getElementById("solarHps").value,
+        solarTensionBatt: document.getElementById("solarTensionBatt").value,
+        solarTechBatt: document.getElementById("solarTechBatt").value,
+        solarAutonomie: document.getElementById("solarAutonomie").value,
+        solarPanneauWc: document.getElementById("solarPanneauWc").value,
+        rows: []
+      };
+
+      const rows = document.querySelectorAll("#corpsTableau tr");
+      rows.forEach(r => {
+        dataToSave.rows.push({
+          desig: r.querySelector(".row-desig").value,
+          qte: r.querySelector(".row-qte").value,
+          p: r.querySelector(".row-p").value,
+          ku: r.querySelector(".row-ku").value,
+          ks: r.querySelector(".row-ks").value,
+          cosphi: r.querySelector(".row-cosphi").value,
+          duree: r.querySelector(".row-duree").value,
+          dureeNuit: r.querySelector(".row-duree-nuit").value
+        });
+      });
+
+      localStorage.setItem("bold_bilan_fullwidth_data", JSON.stringify(dataToSave));
+    }
+
+    function chargerLocal() {
+      const saved = localStorage.getItem("bold_bilan_fullwidth_data") || localStorage.getItem("bold_bilan_clean_data") || localStorage.getItem("bold_bilan_solar_data");
+      const tbody = document.getElementById("corpsTableau");
+      tbody.innerHTML = "";
+
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          document.getElementById("projClient").value = data.client || "";
+          document.getElementById("projNom").value = data.nom || "";
+          document.getElementById("projSite").value = data.site || "";
+          if (data.date) document.getElementById("projDate").value = data.date;
+          if (data.tension) document.getElementById("tensionReseau").value = data.tension;
+          if (data.marge) document.getElementById("margeExtension").value = data.marge;
+
+          if (data.isAdvanced) {
+            document.getElementById("toggleAdvanced").checked = true;
+            document.body.classList.add("show-advanced");
+          }
+
+          if (data.isSolar) {
+            document.getElementById("toggleSolar").checked = true;
+            document.body.classList.add("show-solar");
+          }
+
+          if (data.solarHps) document.getElementById("solarHps").value = data.solarHps;
+          if (data.solarTensionBatt) document.getElementById("solarTensionBatt").value = data.solarTensionBatt;
+          if (data.solarTechBatt) document.getElementById("solarTechBatt").value = data.solarTechBatt;
+          if (data.solarAutonomie) document.getElementById("solarAutonomie").value = data.solarAutonomie;
+          if (data.solarPanneauWc) document.getElementById("solarPanneauWc").value = data.solarPanneauWc;
+
+          if (data.rows && data.rows.length > 0) {
+            // Filtrer les anciens exemples de test ou lignes marquées isExample
+            const userRows = data.rows.filter(r => !r.isExample && !(r.desig && r.desig.includes("Exemple guide")));
+            userRows.forEach(r => {
+              insererLigneTableau(
+                r.desig,
+                r.qte,
+                r.p,
+                r.ku,
+                r.ks,
+                r.cosphi,
+                r.duree,
+                r.dureeNuit !== undefined ? r.dureeNuit : Math.min(r.duree, 4)
+              );
+            });
+          }
+        } catch (e) {
+          console.warn("Erreur chargement local", e);
+        }
+      }
+
+      calculerTout();
+    }
+
+    function afficherToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 2500);
+    }
+  </script>
+</body>
+</html>
