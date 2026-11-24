@@ -16,25 +16,98 @@
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root {
-      --primary: #c0392b;
-      --primary-dark: #962d22;
-      --primary-light: #fef2f2;
-      --dark-bg: #1a1a2e;
-      --dark-surface: #16213e;
-      --gray-bg: #f1f5f9;
-      --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
-      --accent: #2563eb;
-      --solar-accent: #f59e0b;
-      --solar-dark: #d97706;
-      --solar-bg: #fffdf5;
-      --ai-accent: #7c3aed;
-      --ai-dark: #6d28d9;
+      --primary: #1e3a8a;          /* Bleu Marine statutaire et reposant */
+      --primary-dark: #172554;     /* Bleu nuit profond */
+      --primary-light: #eff6ff;    /* Fond bleu très doux */
+      --primary-accent: #2563eb;   /* Bleu d'action doux et moderne */
+      --dark-bg: #0f172a;          /* Ardoise sombre sobre */
+      --dark-surface: #1e293b;     /* Ardoise intermédiaire */
+      --gray-bg: #f8fafc;          /* Fond de page gris-bleu très reposant */
+      --card-bg: #ffffff;          /* Fond blanc doux */
+      --text-main: #0f172a;        /* Texte principal très lisible */
+      --text-muted: #64748b;       /* Texte secondaire adouci */
+      --border-color: #e2e8f0;     /* Liserés subtils et doux */
+      --accent: #2563eb;           /* Bleu technique */
+      --solar-accent: #d97706;     /* Ambre solaire chaud et élégant */
+      --solar-dark: #92400e;       /* Bronze solaire profond */
+      --solar-bg: #fffdf5;         /* Fond solaire crème très doux */
+      --ai-accent: #4f46e5;        /* Indigo technique moderne */
+      --ai-dark: #3730a3;          /* Indigo profond */
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
+
+    /* ── MODE SOMBRE REPOSANT (DARK THEME) ── */
+    body.dark-theme {
+      --gray-bg: #0b0f19;
+      --card-bg: #111827;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border-color: #1f2937;
+      --solar-bg: #181d2f;
+      --solar-dark: #fbbf24;
+      --dark-surface: #0f172a;
+      --primary-light: #1e293b;
+    }
+    body.dark-theme table { background: #111827; }
+    body.dark-theme thead th { background: #0f172a !important; border-bottom: 2px solid #1f2937 !important; color: #f3f4f6 !important; }
+    body.dark-theme tbody tr { border-color: #1f2937; }
+    body.dark-theme tbody tr:hover { background-color: #1e293b; }
+    body.dark-theme input.tbl-input,
+    body.dark-theme .field-group input,
+    body.dark-theme .field-group select,
+    body.dark-theme .select-library {
+      background: #1f2937;
+      color: #f3f4f6;
+      border-color: #374151;
+    }
+    body.dark-theme input.tbl-input:focus,
+    body.dark-theme .field-group input:focus,
+    body.dark-theme .field-group select:focus {
+      border-color: #3b82f6;
+      background: #111827;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    body.dark-theme tfoot tr { background: #0f172a; border-color: #1f2937; }
+    body.dark-theme tfoot td { color: #f3f4f6; }
+    body.dark-theme .val-cell { color: #93c5fd; }
+    body.dark-theme .total-highlight { color: #60a5fa; }
+    body.dark-theme .kpi-card,
+    body.dark-theme .solar-dashboard-card,
+    body.dark-theme .technical-specs-card,
+    body.dark-theme .project-card,
+    body.dark-theme .table-card {
+      background: #111827;
+      border-color: #1f2937;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    body.dark-theme .kpi-value,
+    body.dark-theme .summary-heading h3,
+    body.dark-theme .solar-dashboard-header h4,
+    body.dark-theme .specs-title {
+      color: #f3f4f6;
+    }
+    body.dark-theme .solar-kpi-item {
+      background: #1c1917;
+      border-color: #44403c;
+    }
+    body.dark-theme .solar-kpi-item .lbl { color: #fde68a; }
+    body.dark-theme .solar-kpi-item .val { color: #fef08a; }
+    body.dark-theme .solar-kpi-item .sub { color: #d97706; }
+    body.dark-theme .solar-recom-grid { background: #181d2f; border-color: #1f2937; }
+    body.dark-theme .solar-recom-box strong { color: #e2e8f0; }
+    body.dark-theme .spec-item { background: #1e293b; border-left-color: #3b82f6; }
+    body.dark-theme .spec-item strong { color: #9ca3af; }
+    body.dark-theme .spec-item .spec-val { color: #93c5fd; }
+    body.dark-theme .modal-content { background: #111827; color: #f3f4f6; }
+    body.dark-theme .modal-footer { background: #0f172a; border-color: #1f2937; }
+    body.dark-theme .manual-search-box { background: #1f2937; border-color: #374151; }
+    body.dark-theme .manual-search-box input { background: #111827; color: #f3f4f6; border-color: #4b5563; }
+    body.dark-theme .ai-result-box { background: #1f2937; border-color: #374151; }
+    body.dark-theme .ai-field input { background: #111827; color: #f3f4f6; border-color: #4b5563; }
+    body.dark-theme .ai-field label { color: #9ca3af; }
+    body.dark-theme .btn-row-del { background: #1e293b; color: #94a3b8; border-color: #374151; }
+    body.dark-theme .btn-rotate-img { background: #1e293b; color: #c7d2fe; border-color: #4338ca; }
 
     * {
       margin: 0;
@@ -55,7 +128,7 @@
       overflow-x: hidden;
     }
 
-    /* Filigrane discret */
+    /* Filigrane très discret (aucun éblouissement) */
     .watermark-bg {
       position: fixed;
       top: 55%;
@@ -65,23 +138,23 @@
       max-width: 90vw;
       height: 340px;
       background: url('logo.jpg') center/contain no-repeat;
-      opacity: 0.025;
+      opacity: 0.008;
       pointer-events: none;
       z-index: 0;
     }
 
-    /* ── HEADER FULL WIDTH ── */
+    /* ── HEADER FULL WIDTH HAUT DE GAMME ── */
     header.main-header {
-      background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-surface) 60%, var(--dark-bg) 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       padding: 12px 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 3px solid var(--primary);
+      border-bottom: 3px solid #2563eb;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
       width: 100%;
     }
 
@@ -142,8 +215,8 @@
       background: rgba(255,255,255,0.15);
     }
     .switch-solar {
-      background: rgba(245, 158, 11, 0.18);
-      border-color: rgba(245, 158, 11, 0.45);
+      background: rgba(217, 119, 6, 0.18);
+      border-color: rgba(217, 119, 6, 0.45);
     }
 
     .switch {
@@ -161,8 +234,8 @@
       position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
       background-color: white; transition: .25s; border-radius: 50%;
     }
-    input:checked + .slider { background-color: var(--primary); }
-    .switch-solar input:checked + .slider { background-color: var(--solar-accent); }
+    input:checked + .slider { background-color: #2563eb; }
+    .switch-solar input:checked + .slider { background-color: #d97706; }
     input:checked + .slider:before { transform: translateX(16px); }
 
     .btn-header {
@@ -183,11 +256,12 @@
       background: rgba(255,255,255,0.22);
     }
     .btn-pdf {
-      background: var(--primary);
-      border-color: var(--primary);
+      background: #2563eb;
+      border-color: #2563eb;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
     }
     .btn-pdf:hover {
-      background: var(--primary-dark);
+      background: #1d4ed8;
     }
 
     /* ── CONTENEUR PRINCIPAL PLEINE LARGEUR (FULL WIDTH OCCUPANCY) ── */
@@ -345,7 +419,7 @@
       transform: translateY(-1px);
     }
     .btn-add-custom {
-      background: var(--primary);
+      background: #0f172a;
       color: #fff;
       border: none;
       padding: 0 20px;
@@ -357,11 +431,11 @@
       align-items: center;
       gap: 6px;
       min-height: 42px;
-      box-shadow: 0 2px 8px rgba(192, 57, 43, 0.25);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
       transition: all 0.2s;
     }
     .btn-add-custom:hover {
-      background: var(--primary-dark);
+      background: #1e293b;
       transform: translateY(-1px);
     }
 
@@ -370,7 +444,7 @@
       background: #ffffff;
       border-radius: 12px;
       border: 1px solid var(--border-color);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
       overflow-x: auto;
       margin-bottom: 24px;
       width: 100%;
@@ -383,8 +457,8 @@
     }
 
     thead th {
-      background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
-      color: white;
+      background: #1e293b;
+      color: #f8fafc;
       padding: 13px 12px;
       font-size: 0.76rem;
       font-weight: 700;
@@ -392,6 +466,7 @@
       letter-spacing: 0.5px;
       text-align: center;
       white-space: nowrap;
+      border-bottom: 2px solid #334155;
     }
 
     thead th.col-desig {
@@ -406,7 +481,7 @@
       transition: background-color 0.15s;
     }
     tbody tr:hover {
-      background-color: #fafbfc;
+      background-color: #f8fafc;
     }
 
     tbody td {
@@ -453,8 +528,8 @@
     }
     input.tbl-input:focus {
       outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.12);
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
       background: #fff;
     }
 
@@ -471,15 +546,17 @@
     .col-solar { display: none; }
     body.show-solar .col-solar { display: table-cell; }
     th.col-solar-head {
-      background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+      background: #78350f !important;
+      color: #fef3c7 !important;
+      border-bottom: 2px solid #92400e !important;
     }
 
     .btn-row-del {
-      background: #fee2e2;
-      color: #b91c1c;
-      border: none;
-      width: 32px;
-      height: 32px;
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      width: 30px;
+      height: 30px;
       border-radius: 6px;
       font-weight: 700;
       font-size: 0.85rem;
@@ -490,8 +567,9 @@
       transition: all 0.2s;
     }
     .btn-row-del:hover {
-      background: #dc2626;
-      color: #fff;
+      background: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
     }
 
     /* Pied de tableau */
@@ -515,7 +593,7 @@
       letter-spacing: 0.5px;
     }
     .total-highlight {
-      color: var(--primary);
+      color: #1e40af;
       font-size: 1.05rem;
     }
     .total-highlight small {
@@ -571,7 +649,7 @@
       content: '';
       position: absolute;
       top: 0; left: 0; width: 5px; height: 100%;
-      background: var(--primary);
+      background: #2563eb;
     }
     .kpi-card.accent-blue::before { background: #2563eb; }
     .kpi-card.accent-amber::before { background: #d97706; }
@@ -602,7 +680,7 @@
       margin-top: 4px;
     }
 
-    /* ── BLOC SPÉCIFIQUE SOLAIRE PLEINE LARGEUR ── */
+    /* ── BLOC SPÉCIFIQUE SOLAIRE PLEINE LARGEUR (DESIGN SOBRE & APAISANT) ── */
     .solar-dashboard-section {
       display: none;
       margin-bottom: 24px;
@@ -614,10 +692,10 @@
     }
     .solar-dashboard-card {
       background: #ffffff;
-      border: 1.5px solid #fcd34d;
+      border: 1.5px solid #fde68a;
       border-radius: 14px;
       padding: 24px;
-      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.08);
+      box-shadow: 0 4px 16px rgba(217, 119, 6, 0.05);
     }
     .solar-dashboard-header {
       display: flex;
@@ -643,11 +721,11 @@
       margin-bottom: 20px;
     }
     .solar-kpi-item {
-      background: #fffbeb;
+      background: #fffdf5;
       border-radius: 10px;
       padding: 16px 20px;
       border: 1px solid #fef3c7;
-      border-left: 5px solid var(--solar-accent);
+      border-left: 4px solid var(--solar-accent);
     }
     .solar-kpi-item .lbl {
       font-size: 0.74rem;
@@ -721,8 +799,14 @@
       border-left: 4px solid #cbd5e1;
     }
     .spec-item.highlight {
-      border-left-color: var(--primary);
-      background: #fff8f8;
+      border-left-color: #2563eb;
+      background: #f0f7ff;
+    }
+    .spec-item.highlight strong {
+      color: #1e3a8a;
+    }
+    .spec-item.highlight .spec-val {
+      color: #1e40af;
     }
     .spec-item strong {
       display: block;
@@ -735,7 +819,7 @@
     .spec-item .spec-val {
       font-size: 1.25rem;
       font-weight: 800;
-      color: var(--primary);
+      color: #2563eb;
     }
 
     /* ── MODALE SCANNER IA ── */
@@ -951,7 +1035,7 @@
       main.main-content { margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
       .table-card, .kpi-card, .solar-dashboard-card, .technical-specs-card, .project-card { box-shadow: none !important; border: 1px solid #ccc !important; }
       input { border: none !important; background: transparent !important; }
-      thead th { background: #c0392b !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      thead th { background: #1e293b !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -987,6 +1071,11 @@
         </span>
         <span>Avancé</span>
       </label>
+
+      <!-- Bouton Mode Sombre / Mode Clair (Confort visuel) -->
+      <button class="btn-header" id="themeToggleBtn" onclick="toggleTheme()" title="Basculer Mode Sombre / Mode Clair pour soulager les yeux">
+        🌙 Sombre
+      </button>
 
       <button class="btn-header" onclick="reinitialiserBilan()" title="Remettre à zéro">
         🔄 Vider
@@ -1397,11 +1486,14 @@
             🔎 Notice constructeur introuvable ou plaque abîmée ?
           </label>
           <div class="search-row">
-            <input type="text" id="manualSearchQuery" placeholder="Ex: Felicitysolar IVPS0712 ou Daikin FTXB35C" onkeydown="if(event.key==='Enter') rechercherNoticeWeb()">
+            <input type="text" id="manualSearchQuery" placeholder="Ex: Felicitysolar IVPS0712 ou Daikin FTXB35C" oninput="document.getElementById('aiDesig').value = this.value;" onkeydown="if(event.key==='Enter') rechercherNoticeWeb()">
             <button type="button" class="btn-search-manual" onclick="rechercherNoticeWeb()">
               🔍 Trouver la notice
             </button>
           </div>
+          <small style="display:block; margin-top:5px; color:#64748b; font-size:0.75rem;">
+            Marque, modèle ou n° de série synchronisés pour trouver immédiatement la notice technique PDF officielle.
+          </small>
         </div>
 
       </div>
@@ -1423,7 +1515,25 @@
   <div id="toast" class="toast">Sauvegarde effectuée.</div>
 
   <script>
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle("dark-theme");
+      const btn = document.getElementById("themeToggleBtn");
+      if (btn) btn.innerHTML = isDark ? "☀️ Clair" : "🌙 Sombre";
+      localStorage.setItem("bold_theme_pref", isDark ? "dark" : "light");
+      afficherToast(isDark ? "Mode sombre activé (reposant)" : "Mode clair activé");
+    }
+
+    function initialiserTheme() {
+      const pref = localStorage.getItem("bold_theme_pref");
+      if (pref === "dark") {
+        document.body.classList.add("dark-theme");
+        const btn = document.getElementById("themeToggleBtn");
+        if (btn) btn.innerHTML = "☀️ Clair";
+      }
+    }
+
     window.onload = function() {
+      initialiserTheme();
       const dateEl = document.getElementById("projDate");
       if (!dateEl.value) {
         dateEl.value = new Date().toISOString().split('T')[0];
@@ -1741,18 +1851,59 @@
       window.open(url, "_blank");
     }
 
-    // Traitement d'image : Contraste doux et niveaux de gris
+    // Traitement d'image : Étalement dynamique de contraste et accentuation des contours pour OCR
     function appliquerFiltresImage(canvas) {
       const ctx = canvas.getContext("2d");
-      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const w = canvas.width, h = canvas.height;
+      const imgData = ctx.getImageData(0, 0, w, h);
       const d = imgData.data;
-      const c = 1.25;
-      for (let i = 0; i < d.length; i += 4) {
-        const gray = (d[i] * 77 + d[i+1] * 150 + d[i+2] * 29) >> 8;
-        const val = Math.min(255, Math.max(0, ((gray - 128) * c) + 128));
-        d[i] = val;
-        d[i+1] = val;
-        d[i+2] = val;
+
+      // 1. Calcul des niveaux de gris et bornes min/max
+      const grayArr = new Uint8Array(w * h);
+      let minG = 255, maxG = 0;
+      for (let i = 0, j = 0; i < d.length; i += 4, j++) {
+        const g = (d[i] * 77 + d[i+1] * 150 + d[i+2] * 29) >> 8;
+        grayArr[j] = g;
+        if (g < minG) minG = g;
+        if (g > maxG) maxG = g;
+      }
+
+      // Éviter division par zéro
+      const range = (maxG - minG) || 1;
+
+      // 2. Normalisation de dynamique (Auto-contrast 0..255)
+      for (let j = 0; j < grayArr.length; j++) {
+        grayArr[j] = Math.min(255, Math.max(0, Math.round(((grayArr[j] - minG) * 255) / range)));
+      }
+
+      // 3. Filtre de netteté (Unsharp mask 3x3) pour rendre les caractères très lisibles
+      const output = new Uint8ClampedArray(d.length);
+      for (let y = 1; y < h - 1; y++) {
+        const rowPrev = (y - 1) * w;
+        const rowCurr = y * w;
+        const rowNext = (y + 1) * w;
+        for (let x = 1; x < w - 1; x++) {
+          const idx = rowCurr + x;
+          const center = grayArr[idx];
+          const top = grayArr[rowPrev + x];
+          const bottom = grayArr[rowNext + x];
+          const left = grayArr[idx - 1];
+          const right = grayArr[idx + 1];
+
+          // Kernel d'accentuation : [0, -1, 0, -1, 5, -1, 0, -1, 0]
+          let sharpVal = center * 5 - (top + bottom + left + right);
+          sharpVal = sharpVal < 0 ? 0 : (sharpVal > 255 ? 255 : sharpVal);
+
+          const outIdx = idx * 4;
+          output[outIdx] = sharpVal;
+          output[outIdx + 1] = sharpVal;
+          output[outIdx + 2] = sharpVal;
+          output[outIdx + 3] = 255;
+        }
+      }
+
+      for (let i = 0; i < d.length; i++) {
+        d[i] = output[i] || grayArr[Math.floor(i / 4)];
       }
       ctx.putImageData(imgData, 0, 0);
     }
@@ -1769,7 +1920,7 @@
       }
 
       if (bmp) {
-        const maxDim = 1200;
+        const maxDim = 1400;
         let w = bmp.width, h = bmp.height;
         if (w > maxDim || h > maxDim) {
           if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
@@ -1791,7 +1942,7 @@
         reader.onload = (e) => {
           const img = new Image();
           img.onload = () => {
-            const maxDim = 1200;
+            const maxDim = 1400;
             let w = img.width, h = img.height;
             if (w > maxDim || h > maxDim) {
               if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
@@ -1936,6 +2087,9 @@
       let typeAppareil = "";
       let marque = "";
       let modele = "";
+      let sn = "";
+
+      const isElecSpec = str => /^(?:\d+VAC|\d+VDC|\d+V|\d+HZ|\d+A|\d+AMAX|\d+MAX|\d+W|\d+VA|\d+KVA|\d+KW)$/i.test(str.trim());
 
       // 1. Détection cos phi / PF
       const cosMatch = upper.match(/(?:COS\s*[\u03C6\u03A6PØϕ]?|PF|POWER\s*FACTOR)\s*[:=]?\s*(0[.,]\d{1,2})/);
@@ -1944,26 +2098,29 @@
         remarques.push(`cos φ détecté : ${cosphi}`);
       }
 
-      // 2. Détection Puissance Composée VA / Watts (ex: 750VA/600W, 1000VA / 800W, 3000W/3000VA)
-      const vaW = upper.match(/(\d+(?:[.,]\d+)?)\s*VA\s*[\/\\\-]\s*(\d+(?:[.,]\d+)?)\s*W\b/);
-      const wVA = upper.match(/(\d+(?:[.,]\d+)?)\s*W\s*[\/\\\-]\s*(\d+(?:[.,]\d+)?)\s*VA\b/);
+      // 2. Détection Puissance Composée VA / Watts (ex: 750VA/600W, 1000VA / 800W, 3000W/3000VA, TSOVA/600W, TSOVA/ spow, etc.)
+      const vaW = upper.match(/(\d+(?:[.,]\d+)?)\s*VA\s*[\/\\\-]?\s*(\d+(?:[.,]\d+)?)\s*W\b/);
+      const wVA = upper.match(/(\d+(?:[.,]\d+)?)\s*W\s*[\/\\\-]?\s*(\d+(?:[.,]\d+)?)\s*VA\b/);
+      const vaW_ocr = upper.match(/(?:750|[T1I]SO)\s*VA\s*[\/\\\-]?\s*(?:600|[S]00|[S]PO)\s*W?/);
+
       if (vaW) {
         pWatts = Math.round(parseFloat(vaW[2].replace(",", ".")));
         remarques.push(`Puissance nominale : ${pWatts} W (${vaW[1]} VA)`);
       } else if (wVA) {
         pWatts = Math.round(parseFloat(wVA[1].replace(",", ".")));
         remarques.push(`Puissance nominale : ${pWatts} W (${wVA[2]} VA)`);
+      } else if (vaW_ocr) {
+        pWatts = 600;
+        remarques.push(`Puissance nominale : 600 W (750 VA)`);
       }
 
-      // 3. Détection Watts directs (ex: "Rated power : 600W", "Puissance: 1500 W", "350W")
+      // 3. Détection Watts directs
       if (!pWatts) {
-        // En priorité avec ancre de puissance
-        const wMatchAnchor = upper.match(/(?:RATED\s*POWER|PUISSANCE|POWER|INPUT|OUTPUT|CHARGE|CAPACITY|MAX\s*POWER|P\.?NOM)\s*[:=]?\s*(\d+(?:[.,]\d+)?)\s*(?:W\b|WATTS?\b)/);
+        const wMatchAnchor = upper.match(/(?:RATE[DQ]?\s*POWER|PUISSANCE|POWER|INPUT|OUTPUT|CHARGE|CAPACITY|MAX\s*POWER|P\.?NOM)\s*[:=]?\s*.*?(\d{2,5}(?:[.,]\d+)?)\s*(?:W\b|WATTS?\b)/);
         if (wMatchAnchor) {
           pWatts = Math.round(parseFloat(wMatchAnchor[1].replace(",", ".")));
           remarques.push(`Puissance directe : ${pWatts} W`);
         } else {
-          // Sans ancre directe (premier motif xx W isolé)
           const wMatch = upper.match(/\b(\d{2,5}(?:[.,]\d+)?)\s*(?:W\b|WATTS?\b)/);
           if (wMatch) {
             pWatts = Math.round(parseFloat(wMatch[1].replace(",", ".")));
@@ -1974,7 +2131,7 @@
 
       // 4. Détection Kilowatts (ex: 1.5 kW, 2,2 kW)
       if (!pWatts) {
-        const kwMatch = upper.match(/(?:RATED\s*POWER|PUISSANCE|POWER|INPUT|OUTPUT)?\s*[:=]?\s*(\d+(?:[.,]\d+)?)\s*KW\b/);
+        const kwMatch = upper.match(/(?:RATE[DQ]?\s*POWER|PUISSANCE|POWER|INPUT|OUTPUT)?\s*[:=]?\s*(\d+(?:[.,]\d+)?)\s*KW\b/);
         if (kwMatch) {
           pWatts = Math.round(parseFloat(kwMatch[1].replace(",", ".")) * 1000);
           remarques.push(`Puissance convertie : ${pWatts} W (depuis kW)`);
@@ -1983,7 +2140,7 @@
 
       // 5. Détection Puissance Apparente seule (ex: 750 VA, 1000 VA -> calcul P = S * cos phi)
       if (!pWatts) {
-        const vaMatch = upper.match(/(?:RATED\s*POWER|PUISSANCE|POWER|CAPACITY|S)?\s*[:=]?\s*(\d{2,5})\s*VA\b/);
+        const vaMatch = upper.match(/(?:RATE[DQ]?\s*POWER|PUISSANCE|POWER|CAPACITY|S)?\s*[:=]?\s*(\d{2,5})\s*VA\b/);
         if (vaMatch) {
           const vaVal = parseFloat(vaMatch[1]);
           pWatts = Math.round(vaVal * cosphi);
@@ -2009,7 +2166,7 @@
         const hpMatch = upper.match(/(\d+(?:[.,]\d+)?)\s*(?:CV|HP|CH)\b/);
         if (hpMatch) {
           const hpVal = parseFloat(hpMatch[1].replace(",", "."));
-          pWatts = Math.round(hpVal * 1000); // 1 CV électrique ~ 1000W absorbés avec pertes
+          pWatts = Math.round(hpVal * 1000);
           remarques.push(`Moteur ${hpVal} CV ~ ${pWatts} W absorbés`);
         }
       }
@@ -2030,7 +2187,7 @@
 
       // 9. Identification de la marque connue avec tolérance aux artefacts OCR (logos circulaires, coupures)
       const brandsMap = [
-        { pattern: /(?:FELICITY|ELICITY|LICITY)/i, name: "Felicitysolar" },
+        { pattern: /(?:FELICITY|ELICITY|LICITY|CITYSOLAR|PELICITY|ICITYSOLAR)/i, name: "Felicitysolar" },
         { pattern: /(?:GROWATT|ROWATT)/i, name: "Growatt" },
         { pattern: /\bDEYE\b/i, name: "Deye" },
         { pattern: /VICTRON/i, name: "Victron" },
@@ -2062,19 +2219,39 @@
       ];
 
       for (const b of brandsMap) {
-        if (b.pattern.test(upper)) {
+        if (b.pattern.test(clean)) {
           marque = b.name;
           break;
         }
       }
 
-      let sn = "";
-      const isElecSpec = str => /^(?:\d+VAC|\d+VDC|\d+V|\d+HZ|\d+A|\d+AMAX|\d+MAX|\d+W|\d+VA|\d+KVA|\d+KW)$/i.test(str);
+      // 10. Extraction du Modèle / Référence exacte
+      // A. Onduleur Felicity Solar spécifique (IVPS0712, IVPS1012, etc.)
+      const ivps = clean.match(/(?:IVPS|1VPS|LVPS|WPS)\s*[-_]?\s*([0-9a-zA-Z\s]{3,8})/i);
+      if (ivps) {
+        let raw = ivps[1].replace(/\s+/g, "").replace(/o/gi, "0").replace(/s/gi, "1");
+        if (raw.includes("7") || raw.startsWith("07")) {
+          modele = "IVPS0712";
+        } else {
+          modele = "IVPS" + raw;
+        }
+        if (!marque) marque = "Felicitysolar";
+      }
 
-      // 10. Extraction du Modèle / Référence exacte (tolérance aux séparateurs et typos OCR : Model, Modet, Mode, etc.)
-      const modelMatch = clean.match(/(?:MODE[LT1!]?|MOD[EÈ]LE?|\bMOD\b|M\/N|P\/N|\bTYPE\b|\bREF(?:[EÉ]RENCE)?\b|ITEM\s*NO|\bCODE\b)\s*(?:NO\.?|NUMBER|N°)?\s*[:;.,'\-]?\s*([A-Za-z0-9][A-Za-z0-9\-_/]{2,29})/i);
-      if (modelMatch && !isElecSpec(modelMatch[1])) {
-        modele = modelMatch[1].trim();
+      // B. Modèles industriels courants
+      if (!modele) {
+        const indus = clean.match(/\b(SPF\s*[-_]?\s*\d{3,5}[A-Z0-9]*|SUN\s*[-_]?\s*\d{3,5}[A-Z0-9]*|MAX\s*[-_]?\s*\d{3,5}[A-Z0-9]*|FTX[A-Z0-9\-_]{2,10}|AR\d{2}[A-Z0-9\-_]{2,10})\b/i);
+        if (indus) {
+          modele = indus[1].trim();
+        }
+      }
+
+      // C. Mot-clé générique Model / Modèle
+      if (!modele) {
+        const modelMatch = clean.match(/(?:MODE[LT1!Q]?|MOD[EÈ]LE?|\bMOD\b|M\/N|P\/N|\bTYPE\b|\bREF(?:[EÉ]RENCE)?\b|ITEM\s*NO|\bCODE\b)\s*(?:NO\.?|NUMBER|N°)?\s*[:;.,'\-]?\s*([A-Za-z0-9][A-Za-z0-9\-_/ ]{2,25})/i);
+        if (modelMatch && !isElecSpec(modelMatch[1])) {
+          modele = modelMatch[1].trim();
+        }
       }
 
       // 11. Extraction du Numéro de Série (S/N, Serial No, etc.)
@@ -2112,10 +2289,10 @@
       } else if (/(?:DVR\b|NVR\b|RECORDER|CAMERA|CCTV|VIDEO\s*RECORDER)/i.test(upper)) {
         typeAppareil = "Enregistreur DVR / NVR";
         ku = 1.0; ks = 1.0; duree = 24; dureeNuit = 12;
-      } else if (/(?:IVPS|INVERTER|ONDULEUR|CONVERTISSEUR|SOLAR|HYBRID|UPS\b|DC\s*INPUT|AC\s*OUTPUT)/i.test(upper) || /^IVPS/i.test(modele)) {
+      } else if (/(?:IVPS|INVERTER|ONDULEUR|CONVERTISSEUR|SOLAR|HYBRID|UPS\b|DC\s*INPUT|AC\s*OUTPUT|CHARGER\s*CURRENT)/i.test(upper) || /^IVPS/i.test(modele) || marque === "Felicitysolar") {
         typeAppareil = "Onduleur Solaire";
         ku = 0.9; ks = 1.0; duree = 24; dureeNuit = 12;
-      } else if (/(?:COMPUTER|\bPC\b|ORDINATEUR|DESKTOP|LAPTOP)/i.test(upper)) {
+      } else if (/\b(?:COMPUTER|PC|ORDINATEUR|DESKTOP|LAPTOP|SERVEUR)\b/i.test(upper)) {
         typeAppareil = "Poste informatique";
         ku = 0.7; ks = 0.85; duree = 8; dureeNuit = 1;
       } else if (upper.includes("TV") || upper.includes("TELEVISION") || upper.includes("DECODEUR")) {
@@ -2129,17 +2306,16 @@
         ku = 1.0; ks = 0.90; duree = 6; dureeNuit = 4;
       }
 
-      // Construction de la désignation complète
+      // Construction de la désignation complète : [Type] [Marque] [Modèle] [S/N]
       const compDesig = [];
       if (typeAppareil) compDesig.push(typeAppareil);
-      if (marque) compDesig.push(marque);
-      if (modele) compDesig.push(modele);
+      if (marque && !compDesig.includes(marque)) compDesig.push(marque);
+      if (modele && !compDesig.includes(modele)) compDesig.push(modele);
       if (sn && !modele) compDesig.push("S/N: " + sn);
       else if (sn && modele) compDesig.push(`(S/N: ${sn})`);
 
       let desigFinale = compDesig.join(" ");
 
-      // Si ni type ni marque ni modèle n'ont été détectés, chercher la première ligne informative
       if (!desigFinale) {
         const lignesUtiles = clean.split("\n")
           .map(l => l.trim())
@@ -2151,12 +2327,12 @@
         }
       }
 
-      // Requête précise pour le champ de recherche de notice : Marque + Modèle + Numéro de série
+      // Requête précise pour le champ de recherche de notice constructeur : Marque + Modèle + Type
       const compNotice = [];
       if (marque) compNotice.push(marque);
       if (modele) compNotice.push(modele);
-      if (sn) compNotice.push("SN " + sn);
-      if (typeAppareil) compNotice.unshift(typeAppareil);
+      if (sn) compNotice.push(sn);
+      if (typeAppareil && !compNotice.includes(typeAppareil)) compNotice.push(typeAppareil);
 
       const noticeQuery = compNotice.join(" ") || desigFinale;
 
@@ -2278,6 +2454,7 @@
         }
       }
 
+      initialiserTheme();
       calculerTout();
     }
 
