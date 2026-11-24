@@ -243,43 +243,6 @@
     .switch-solar input:checked + .slider { background-color: #d97706; }
     input:checked + .slider:before { transform: translateX(16px); }
 
-    /* Contrôleur de taille de police (Accessibilité & Confort oculaire) */
-    .font-size-control {
-      display: inline-flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      border-radius: 6px;
-      overflow: hidden;
-      height: 35px;
-    }
-    .btn-font-size {
-      background: transparent;
-      color: #f8fafc;
-      border: none;
-      padding: 0 10px;
-      height: 100%;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .btn-font-size:hover {
-      background: rgba(255, 255, 255, 0.22);
-    }
-    .btn-font-size:active {
-      background: rgba(255, 255, 255, 0.35);
-    }
-    .font-size-indicator {
-      color: #93c5fd;
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 0 6px;
-      user-select: none;
-      min-width: 44px;
-      text-align: center;
-    }
-
     .btn-header {
       background: rgba(255,255,255,0.12);
       color: #fff;
@@ -1121,13 +1084,6 @@
         🌙 Sombre
       </button>
 
-      <!-- Contrôleur de Taille de Police (A- / A+) -->
-      <div class="font-size-control" title="Ajuster la taille du texte pour le confort des yeux">
-        <button type="button" class="btn-font-size" onclick="changerTaillePolice(-1)" title="Diminuer le texte (A-)">A-</button>
-        <span id="fontSizeIndicator" class="font-size-indicator" title="Taille actuelle de la police">100%</span>
-        <button type="button" class="btn-font-size" onclick="changerTaillePolice(1)" title="Agrandir le texte (A+)">A+</button>
-      </div>
-
       <button class="btn-header" onclick="reinitialiserBilan()" title="Remettre à zéro">
         🔄 Vider
       </button>
@@ -1583,42 +1539,8 @@
       }
     }
 
-    /* ── GESTION DE LA TAILLE DE POLICE (CONFORT VISUEL) ── */
-    let currentFontSizePercent = 100;
-    const fontLevels = [85, 92, 100, 110, 120, 130];
-
-    function changerTaillePolice(delta) {
-      let idx = fontLevels.indexOf(currentFontSizePercent);
-      if (idx === -1) idx = 2; // 100%
-      let nextIdx = Math.max(0, Math.min(fontLevels.length - 1, idx + delta));
-      currentFontSizePercent = fontLevels[nextIdx];
-      appliquerTaillePolice(currentFontSizePercent);
-      localStorage.setItem("bold_font_size", currentFontSizePercent);
-      afficherToast(`Taille du texte : ${currentFontSizePercent}%`);
-    }
-
-    function appliquerTaillePolice(percent) {
-      document.documentElement.style.fontSize = (18 * (percent / 100)) + "px";
-      const ind = document.getElementById("fontSizeIndicator");
-      if (ind) ind.textContent = percent + "%";
-    }
-
-    function initialiserTaillePolice() {
-      const saved = localStorage.getItem("bold_font_size");
-      if (saved) {
-        const val = parseInt(saved, 10);
-        if (!isNaN(val) && fontLevels.includes(val)) {
-          currentFontSizePercent = val;
-          appliquerTaillePolice(currentFontSizePercent);
-          return;
-        }
-      }
-      appliquerTaillePolice(100);
-    }
-
     window.onload = function() {
       initialiserTheme();
-      initialiserTaillePolice();
       const dateEl = document.getElementById("projDate");
       if (!dateEl.value) {
         dateEl.value = new Date().toISOString().split('T')[0];
@@ -2540,7 +2462,6 @@
       }
 
       initialiserTheme();
-      initialiserTaillePolice();
       calculerTout();
     }
 
